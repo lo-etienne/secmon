@@ -1,0 +1,88 @@
+package be.flmr.secmon.core;
+
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class ProtocolPatternsTests {
+
+    final Stream<Arguments> letterCases() {
+        return Stream.of(
+                Arguments.of('a', true),
+                Arguments.of('A', true),
+                Arguments.of('@', false),
+                Arguments.of('5', false),
+                Arguments.of('(', false),
+                Arguments.of('z', true),
+                Arguments.of('e', true)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("letterCases")
+    final void letterPatternMatchesAllAlphabeticalCharacters(char c, boolean b) {
+        assertRegex(ProtocolPatterns.LETTER, String.format("%c", c), b);
+    }
+
+    final Stream<Arguments> digitCases() {
+        return Stream.of(
+                Arguments.of('0', true),
+                Arguments.of('1', true),
+                Arguments.of('2', true),
+                Arguments.of('3', true),
+                Arguments.of('4', true),
+                Arguments.of('5', true),
+                Arguments.of('6', true),
+                Arguments.of('7', true),
+                Arguments.of('8', true),
+                Arguments.of('9', true),
+                Arguments.of('a', false),
+                Arguments.of('z', false),
+                Arguments.of('#', false),
+                Arguments.of('^', false),
+                Arguments.of('Y', false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("digitCases")
+    final void digitPatternMatchesAllDigits(char c, boolean b) {
+        assertRegex(ProtocolPatterns.DIGIT, String.format("%c", c), b);
+    }
+
+    final Stream<Arguments> alphanumericalCases() {
+        return Stream.of(
+                Arguments.of('0', true),
+                Arguments.of('2', true),
+                Arguments.of('5', true),
+                Arguments.of('8', true),
+                Arguments.of('9', true),
+                Arguments.of('a', true),
+                Arguments.of('z', true),
+                Arguments.of('#', false),
+                Arguments.of('^', false),
+                Arguments.of('Y', true)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("alphanumericalCases")
+    final void letterDigitMatchesAlphanumericals(char c, boolean b) {
+        assertRegex(ProtocolPatterns.LETTER_DIGIT, String.format("%c", c), b);
+    }
+
+    private void assertRegex(String regex, String sequence, boolean expected) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(sequence);
+        assertThat(matcher.matches(), equalTo(expected));
+    }
+}

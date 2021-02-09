@@ -12,6 +12,7 @@ allprojects {
             testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
             testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.7.7'
             testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
+            testImplementation "org.junit.jupiter:junit-jupiter-params:5.6.0"
             testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
         }
 

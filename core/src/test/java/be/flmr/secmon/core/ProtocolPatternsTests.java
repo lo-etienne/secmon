@@ -80,9 +80,24 @@ public class ProtocolPatternsTests {
         assertRegex(ProtocolPatterns.LETTER_DIGIT, String.format("%c", c), b);
     }
 
+    final Stream<Arguments> crlfCases() {
+        return Stream.of(
+                Arguments.of("", false),
+                Arguments.of("\\r", false),
+                Arguments.of("\\n", false),
+                Arguments.of("\\r\\n", true)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("crlfCases")
+    final void stringMatchesCRLF(String s, boolean b) {
+        assertRegex(ProtocolPatterns.CRLF, s, b);
+    }
+
     private void assertRegex(String regex, String sequence, boolean expected) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(sequence);
-        assertThat(matcher.matches(), equalTo(expected));
+        assertThat("Sequence " + sequence + " matches " + regex + ": " + expected, matcher.matches(), equalTo(expected));
     }
 }

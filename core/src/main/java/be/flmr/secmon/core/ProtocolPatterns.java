@@ -17,7 +17,7 @@ public final class ProtocolPatterns {
     public static final String USERNAME = "(" + LETTER_DIGIT + "){3,50}";
     public static final String PASSWORD = CHARACTER_PASS + "{3,50}";
     public static final String HOST = "(" + LETTER_DIGIT + "|[._-]" + "){3,50}";
-    public static final String PATH = "/" + "(" + LETTER_DIGIT + "|[\\/._-]" + "){0,100}";
+    public static final String PATH = "/" + "(" + LETTER_DIGIT + "|[\\\\/._-]" + "){0,100}";
 
     public static final String URL = PROTOCOL + "://" + "(" + USERNAME + "(:" + PASSWORD + ")?" + "@)?" + HOST + "(:" + PORT + ")?" + PATH;
     public static final String MIN = "(" + DIGIT + "){1,8}";//seuil inférieur (pour l’alarme)

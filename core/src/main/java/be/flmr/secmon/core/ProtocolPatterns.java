@@ -26,7 +26,7 @@ public final class ProtocolPatterns {
     public static final String MAX = "(" + DIGIT + "){1,8}";//seuil supérieur (pour l’alarme)
     public static final String FREQUENCY = "(" + DIGIT + "){1,8}";
     public static final String AUGMENTED_URL = ID + "!" + URL + "!" + MIN + "!" + MAX + "!" + FREQUENCY;
-    public static final String STATE = "OK|ALARM|DOWN";
+    public static final String STATE = "(OK|ALARM|DOWN)";
     public static final String MESSAGE = "(" + CHARACTER + "){1,200}";
 
     private ProtocolPatterns(){

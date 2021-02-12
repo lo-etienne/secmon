@@ -2,14 +2,14 @@
   "name": "monitor",
   "version": "1.0.0",
   "multicast_address" : "224.50.50.50",
-  "multicast_port" : "601XX",
+  "multicast_port" : "60150",
   "client_port" : "42069",
   "tls": "false",
   "aes_key": "aPdSgVkYp3s6v9y$B&E(H+MbQeThWmZq",
   "probes": [
     "snmp1!snmp://public@192.168.128.38:161/1.3.6.1.4.1.2021.4.11.0!10000!99999999!120",
     "snmp2!snmp://public@192.168.128.38:161/1.3.6.1.4.1.2021.11.11.0!10!99999999!120",
-    "http1:https://sensor.cg.helmo.be/api/get-temp/!5!35!60",
-    "http2:https://sensor.cg.helmo.be/api/get-humidity/!0!80!60"
+    "http1!https://sensor.cg.helmo.be/api/get-temp/!5!35!60",
+    "http2!https://sensor.cg.helmo.be/api/get-humidity/!0!80!60"
   ]
 }

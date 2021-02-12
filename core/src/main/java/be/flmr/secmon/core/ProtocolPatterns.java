@@ -1,6 +1,8 @@
 package be.flmr.secmon.core;
 
+import java.lang.reflect.Modifier;
 import java.net.PortUnreachableException;
+import java.util.Arrays;
 
 public final class ProtocolPatterns {
     public static final String LETTER = "[A-Za-z]";
@@ -29,5 +31,17 @@ public final class ProtocolPatterns {
 
     private ProtocolPatterns(){
 
+    }
+
+    public static void main(String[] args) {
+        Arrays.stream(ProtocolPatterns.class.getDeclaredFields())
+                .filter(f -> Modifier.isStatic(f.getModifiers()))
+                .forEach(f -> {
+                    try {
+                        System.out.println(f.getName() + " ==> " + f.get(null));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 }

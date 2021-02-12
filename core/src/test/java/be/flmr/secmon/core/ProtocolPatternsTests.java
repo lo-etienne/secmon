@@ -95,6 +95,39 @@ public class ProtocolPatternsTests {
         assertRegex(ProtocolPatterns.CRLF, s, b);
     }
 
+    final Stream<Arguments> portCases() {
+        return Stream.of(
+                Arguments.of("0", false),
+                Arguments.of("1", true),
+                Arguments.of("9", true),
+                Arguments.of("10", true),
+                Arguments.of("11", true),
+                Arguments.of("100", true),
+                Arguments.of("999", true),
+                Arguments.of("1000", true),
+                Arguments.of("1001", true),
+                Arguments.of("9999", true),
+                Arguments.of("10000", true),
+                Arguments.of("10001", true),
+                Arguments.of("11111", true),
+                Arguments.of("22222", true),
+                Arguments.of("33333", true),
+                Arguments.of("44444", true),
+                Arguments.of("55555", true),
+                Arguments.of("65534", true),
+                Arguments.of("65535", true),
+                Arguments.of("65536", false),
+                Arguments.of("99999", false),
+                Arguments.of("111111", false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("portCases")
+    final void stringMatchesPortNumber(String s, boolean b) {
+        assertRegex(ProtocolPatterns.PORT, s, b);
+    }
+
     private void assertRegex(String regex, String sequence, boolean expected) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(sequence);

@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+}
+
+group 'be.flmr.secmon.probe'
+version '0.1'
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation project(":core")
+}

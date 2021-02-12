@@ -2,5 +2,5 @@ rootProject.name = 'secmon'
 include 'core'
 include 'probehttp'
 include 'daemon'
-include 'untitled'
+include 'probe'
 

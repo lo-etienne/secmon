@@ -1,4 +1,7 @@
-package be.flmr.secmon.core.protocols;
+package be.flmr.secmon.core.router;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -8,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RouterLoader {
+    private static final Logger log = LoggerFactory.getLogger(RouterLoader.class);
     public static <T> T loadRouter(final Class<T> type) {
         T instance;
 
@@ -23,7 +27,8 @@ public class RouterLoader {
 
         final Map<Method, String> protocols = new HashMap<>();
 
-        if(type.getAnnotation(Router.class) == null) return null;
+        if(type.getAnnotation(Router.class) == null)
+            log.warn("La classe " + type.getName() + " n'est pas annotée avec l'annotation 'Router'. Il est conseillé de l'annoter.");
         Method[] methods = type.getDeclaredMethods();
 
         for (final Method method : methods) {

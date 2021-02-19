@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+}
+
+group 'be.flmr.secmon.client'
+version '0.1'
+
+dependencies {
+    implementation(project(":core"))
+}

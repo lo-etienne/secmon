@@ -3,4 +3,5 @@ include 'core'
 include 'probehttp'
 include 'daemon'
 include 'probe'
+include 'client'
 

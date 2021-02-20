@@ -3,17 +3,14 @@ package be.flmr.secmon.core;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
-public enum DaemonProbeProtocolPatterns implements PatternExtractor {
+public class DaemonProbeProtocolPatterns {
 
-    CONFING("CURCONFIG(" + ProtocolPatterns.SP.p + ProtocolPatterns.AUGMENTED_URL.p + "){0,100}" + ProtocolPatterns.CRLF.p),
-    STATE_REQ("STATEREQ" + ProtocolPatterns.SP.p + ProtocolPatterns.ID.p + ProtocolPatterns.CRLF.p),
-    STATE_RESP("STATERESP" + ProtocolPatterns.SP.p + ProtocolPatterns.ID.p + ProtocolPatterns.SP.p + ProtocolPatterns.STATE.p + ProtocolPatterns.CRLF.p),
-    ;
+    public static final String CONFING = "CURCONFIG(" + ProtocolPatterns.SP + ProtocolPatterns.AUGMENTED_URL + "){0,100}" + ProtocolPatterns.CRLF;
+    public static final String STATE_REQ = "STATEREQ" + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.CRLF;
+    public static final String STATE_RESP = "STATERESP" + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.SP + ProtocolPatterns.STATE + ProtocolPatterns.CRLF;
 
-    private String p;
+    private DaemonProbeProtocolPatterns(){
 
-    private DaemonProbeProtocolPatterns(String pattern){
-        this.p = pattern;
     }
 
     public static void main(String[] args) {
@@ -26,10 +23,5 @@ public enum DaemonProbeProtocolPatterns implements PatternExtractor {
                         e.printStackTrace();
                     }
                 });
-    }
-
-    @Override
-    public String getPattern() {
-        return p;
     }
 }

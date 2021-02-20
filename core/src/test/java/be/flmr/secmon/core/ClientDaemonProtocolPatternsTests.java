@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static be.flmr.secmon.core.ProtocolPatternsTests.assertRegex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -117,5 +116,11 @@ public class ClientDaemonProtocolPatternsTests {
     @MethodSource("STATE_SERVICE_RESPONSECases")
     final void stringMatchesSTATE_SERVICE_RESPONSE(String s, boolean b) {
         assertRegex(ClientDaemonProtocolPatterns.STATE_SERVICE_RESPONSE, s, b);
+    }
+
+    private void assertRegex(String regex, String sequence, boolean expected) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(sequence);
+        assertThat("Sequence " + sequence + " matches " + regex + ": " + expected, matcher.matches(), equalTo(expected));
     }
 }

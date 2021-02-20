@@ -30,9 +30,9 @@ public class SnmpServiceProber implements ServiceProber {
 
     private static final Logger log = LoggerFactory.getLogger(SnmpServiceProber.class);     
 
-    private CommunityTarget createDefault(String ip, String community) {
+    private CommunityTarget<Address> createDefault(String ip, String community) {
         Address address = GenericAddress.parse(DEFAULT_PROTOCOL + ":" + ip + "/" + DEFAULT_PORT);
-        CommunityTarget target = new CommunityTarget();
+        CommunityTarget<Address> target = new CommunityTarget<>();
 
         target.setCommunity(new OctetString(community));
         target.setAddress(address);
@@ -45,54 +45,38 @@ public class SnmpServiceProber implements ServiceProber {
 
     @Override
     public String get(Service service) {
-        CommunityTarget target = createDefault(service.getIp(), service.getUser());
-        Snmp snmp = null;
+        CommunityTarget<Address> target = createDefault(service.getIp(), service.getUser());
 
-        try {
+        try(Snmp snmp = new Snmp(new DefaultUdpTransportMapping())) {
             PDU pdu = new PDU();
             pdu.add(new VariableBinding(new OID(service.getOid())));
 
-            DefaultUdpTransportMapping transport = new DefaultUdpTransportMapping();
-            snmp = new Snmp(transport);
             snmp.listen();
 
             pdu.setType(PDU.GET);
-            ResponseEvent responseEvent = snmp.send(pdu, target);
+            ResponseEvent<Address> responseEvent = snmp.send(pdu, target);
 
             PDU response = responseEvent.getResponse();
 
             if(response != null) {
                 // if response == null, il y a eu un timeout
-                if (response != null) {
-                    System.out.println("response pdu size is " + response.size());
-                    for (int i = 0; i < response.size(); i++) {
-                        VariableBinding vb = response.get(i);
-                        System.out.println(vb.getOid() + " = " + vb.getVariable());
-                    }
-                }
+                VariableBinding vb = response.get(0);
+                return vb.getVariable().toString();
             }
         } catch(IOException e) {
             System.out.println("Erreur lors de l'écoute.");
             e.printStackTrace();
-        } finally {
-            if(snmp != null) {
-                try {
-                    snmp.close();
-                } catch(IOException exc) {
-                    snmp = null;
-                }
-            }
         }
 
         return null;
     }
 
-    public static void main(String[] args) {
-        Service service = new Service("192.168.128.38", "public", "1.3.6.1.4.1.2021.4.11.0");
+    /*public static void main(String[] args) {
+        Service service = new Service("192.168.128.38", "public", "1.3.6.1.4.1.2021.11.11.0");
 
         SnmpServiceProber prober = new SnmpServiceProber();
         prober.get(service);
-    }
+    }*/
 
 
 }

@@ -1,5 +1,7 @@
 package be.flmr.secmon.core.router;
 
+import be.flmr.secmon.core.patterns.PatternUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -10,7 +12,7 @@ public abstract class AbstractRouter {
     private Map<Method, String> protocols;
 
     public void execute(String input) {
-        for(Map.Entry<Method, String> entry : protocols.entrySet()) {
+        for (Map.Entry<Method, String> entry : protocols.entrySet()) {
             Method method = entry.getKey();
             String regex = entry.getValue();
 
@@ -18,21 +20,20 @@ public abstract class AbstractRouter {
             if (Arrays.stream(parameters).anyMatch(p -> p.getAnnotation(Group.class) == null))
                 throw new IllegalArgumentException("Tous les paramètres de '" + method.getName() + "' ne sont pas annotés avec Group");
 
-            final var pattern = Pattern.compile(regex);
-            final var matcher = pattern.matcher(input);
             final var matches = new String[parameters.length];
 
-            if(matcher.matches()) {
+            if (input.matches(regex)) {
                 for (int i = 0; i < parameters.length; i++) {
                     final var parameter = parameters[i];
                     final var annotation = parameter.getAnnotation(Group.class);
 
                     try {
-                        matches[i] = matcher.group(annotation.groupName());
+                        matches[i] = PatternUtils.extractGroup(input, regex, annotation.groupName());
                     } catch (IllegalArgumentException e) {
                         if (annotation.nullable())
                             matches[i] = null; // Quand le groupe n'est pas présent dans la regex, le string par défaut est null
-                        else throw new RuntimeException("Le paramètre " + parameter.getName() + " a été renseigné comme étant non null", e);
+                        else
+                            throw new RuntimeException("Le paramètre " + parameter.getName() + " a été renseigné comme étant non null", e);
                     }
                 }
 
@@ -40,7 +41,7 @@ public abstract class AbstractRouter {
                     method.setAccessible(true);
                     method.invoke(this, (Object[]) matches);
                     method.setAccessible(false);
-                } catch(IllegalAccessException | InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
             }

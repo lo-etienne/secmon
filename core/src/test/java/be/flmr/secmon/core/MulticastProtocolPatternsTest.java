@@ -1,5 +1,6 @@
 package be.flmr.secmon.core;
 
+import be.flmr.secmon.core.patterns.MulticastProtocolPatterns;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

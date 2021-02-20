@@ -1,7 +1,6 @@
-package be.flmr.secmon.core;
+package be.flmr.secmon.core.patterns;
 
 import java.lang.reflect.Modifier;
-import java.net.PortUnreachableException;
 import java.util.Arrays;
 
 public final class ProtocolPatterns {
@@ -29,7 +28,7 @@ public final class ProtocolPatterns {
     public static final String STATE = "(?<STATE>(OK|ALARM|DOWN))";
     public static final String MESSAGE = "(?<MESSAGE>(" + CHARACTER + "){1,200})";
 
-    private ProtocolPatterns(){
+    private ProtocolPatterns() {
 
     }
 

@@ -27,12 +27,12 @@ public class RouterLoader {
 
         final Map<Method, String> protocols = new HashMap<>();
 
-        if(type.getAnnotation(Router.class) == null)
+        if (type.getAnnotation(Router.class) == null)
             log.warn("La classe " + type.getName() + " n'est pas annotée avec l'annotation 'Router'. Il est conseillé de l'annoter.");
         Method[] methods = type.getDeclaredMethods();
 
         for (final Method method : methods) {
-            if(method.getAnnotation(Protocol.class) != null) {
+            if (method.getAnnotation(Protocol.class) != null) {
                 protocols.put(method, method.getAnnotation(Protocol.class).pattern());
             }
         }

@@ -1,4 +1,4 @@
-package be.flmr.secmon.core;
+package be.flmr.secmon.core.patterns;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;

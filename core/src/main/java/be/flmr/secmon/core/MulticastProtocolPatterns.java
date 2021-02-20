@@ -3,15 +3,15 @@ package be.flmr.secmon.core;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
-public class MulticastProtocolPatterns {
+public enum MulticastProtocolPatterns implements PatternExtractor {
 
-    public static final String ANNOUCE = "IAMHERE" + ProtocolPatterns.SP + ProtocolPatterns.PROTOCOL
-            + ProtocolPatterns.SP + ProtocolPatterns.PORT + ProtocolPatterns.CRLF;
-    public static final String NOTIFICATION = "NOTIFY" + ProtocolPatterns.SP + ProtocolPatterns.PROTOCOL
-            + ProtocolPatterns.SP + ProtocolPatterns.PORT + ProtocolPatterns.CRLF;
+    ANNOUCE("IAMHERE" + ProtocolPatterns.SP.p + ProtocolPatterns.PROTOCOL.p + ProtocolPatterns.SP.p + ProtocolPatterns.PORT.p + ProtocolPatterns.CRLF.p),
+    NOTIFICATION("NOTIFY" + ProtocolPatterns.SP.p + ProtocolPatterns.PROTOCOL.p + ProtocolPatterns.SP.p + ProtocolPatterns.PORT.p + ProtocolPatterns.CRLF.p);
 
-    private MulticastProtocolPatterns(){
+    private String p;
 
+    private MulticastProtocolPatterns(String pattern){
+        this.p = pattern;
     }
 
     public static void main(String[] args) {
@@ -26,4 +26,8 @@ public class MulticastProtocolPatterns {
                 });
     }
 
+    @Override
+    public String getPattern() {
+        return p;
+    }
 }

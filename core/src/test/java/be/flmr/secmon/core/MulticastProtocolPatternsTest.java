@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static be.flmr.secmon.core.ProtocolPatternsTests.assertRegex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -55,11 +56,5 @@ public class MulticastProtocolPatternsTest {
     @MethodSource("NOTIFICATIONCases")
     final void stringMatchesNOTIFICATION(String s, boolean b) {
         assertRegex(MulticastProtocolPatterns.NOTIFICATION, s, b);
-    }
-
-    private void assertRegex(String regex, String sequence, boolean expected) {
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(sequence);
-        assertThat("Sequence " + sequence + " matches " + regex + ": " + expected, matcher.matches(), equalTo(expected));
     }
 }

@@ -566,8 +566,8 @@ public class ProtocolPatternsTests {
         assertRegex(ProtocolPatterns.MESSAGE, s, b);
     }
 
-    private void assertRegex(String regex, String sequence, boolean expected) {
-        Pattern pattern = Pattern.compile(regex);
+    static void assertRegex(PatternExtractor regex, String sequence, boolean expected) {
+        Pattern pattern = Pattern.compile(regex.getPattern());
         Matcher matcher = pattern.matcher(sequence);
         assertThat("Sequence " + sequence + " matches " + regex + ": " + expected, matcher.matches(), equalTo(expected));
     }

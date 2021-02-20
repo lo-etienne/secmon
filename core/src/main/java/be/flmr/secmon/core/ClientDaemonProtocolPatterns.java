@@ -3,29 +3,20 @@ package be.flmr.secmon.core;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
-public class ClientDaemonProtocolPatterns {
-    public static final String ADD_SERVICE_REQUEST
-            = "ADDSRV" + ProtocolPatterns.SP + ProtocolPatterns.AUGMENTED_URL + ProtocolPatterns.CRLF;
-    public static final String ADD_SERVICE_RESPONSE
-            = "(\\+OK|-ERR)" + "(" + ProtocolPatterns.SP
-            + ProtocolPatterns.MESSAGE + ")?"
-            + ProtocolPatterns.CRLF;
+public enum ClientDaemonProtocolPatterns implements PatternExtractor {
+    ADD_SERVICE_REQUEST("ADDSRV" + ProtocolPatterns.SP.p + ProtocolPatterns.AUGMENTED_URL.p + ProtocolPatterns.CRLF.p),
+    ADD_SERVICE_RESPONSE("(\\+OK|-ERR)" + "(" + ProtocolPatterns.SP.p + ProtocolPatterns.MESSAGE.p + ")?" + ProtocolPatterns.CRLF.p),
 
-    public static final String LIST_SERVICE_REQUEST
-            = "LISTSRV" + ProtocolPatterns.CRLF;
-    public static final String LIST_SERVICE_RESPONSE
-            = "SRV(" + ProtocolPatterns.SP + ProtocolPatterns.ID + "){0,100}" + ProtocolPatterns.CRLF;
+    LIST_SERVICE_REQUEST("LISTSRV" + ProtocolPatterns.CRLF.p),
+    LIST_SERVICE_RESPONSE("SRV(" + ProtocolPatterns.SP.p + ProtocolPatterns.ID.p + "){0,100}" + ProtocolPatterns.CRLF.p),
 
-    public static final String STATE_SERVICE_REQUEST
-            = "STATESRV" + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.CRLF;
-    public static final String STATE_SERVICE_RESPONSE
-            = "STATE"
-            + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.SP
-            + ProtocolPatterns.URL + ProtocolPatterns.SP + ProtocolPatterns.STATE
-            + ProtocolPatterns.CRLF;
+    STATE_SERVICE_REQUEST("STATESRV" + ProtocolPatterns.SP.p + ProtocolPatterns.ID.p + ProtocolPatterns.CRLF.p),
+    STATE_SERVICE_RESPONSE("STATE" + ProtocolPatterns.SP.p + ProtocolPatterns.ID.p + ProtocolPatterns.SP.p + ProtocolPatterns.URL.p + ProtocolPatterns.SP.p + ProtocolPatterns.STATE.p + ProtocolPatterns.CRLF.p);
 
-    private ClientDaemonProtocolPatterns() {
+    private String p;
 
+    private ClientDaemonProtocolPatterns(String pattern){
+        this.p = pattern;
     }
 
     public static void main(String[] args) {
@@ -38,5 +29,10 @@ public class ClientDaemonProtocolPatterns {
                         e.printStackTrace();
                     }
                 });
+    }
+
+    @Override
+    public String getPattern() {
+        return p;
     }
 }

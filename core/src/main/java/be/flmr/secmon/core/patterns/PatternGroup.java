@@ -5,11 +5,12 @@ public enum PatternGroup {
     PROTOCOL,
     USERNAME,
     PASSWORD,
+    PORT,
     HOST,
     PATH,
     MIN,
     MAX,
     FREQUENCY,
     STATE,
-    MESSAGE;
+    MESSAGE
 }

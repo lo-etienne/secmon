@@ -2,20 +2,22 @@ package be.flmr.secmon.core.net;
 
 import be.flmr.secmon.core.patterns.PatternGroup;
 import be.flmr.secmon.core.patterns.PatternUtils;
+import be.flmr.secmon.core.patterns.ProtocolPatternsGestionner;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProtocolPacket {
     private Map<PatternGroup, String> values;
-    private String regex;
+    private ProtocolPatternsGestionner protocol;
 
-    public ProtocolPacket(String input, String regex, PatternGroup... groups) {
+    public ProtocolPacket(String input) {
         values = new HashMap<>();
-        this.regex = regex;
+        this.protocol = ProtocolPatternsGestionner.getProtocol(input);
 
-        for (PatternGroup group : groups) {
-            String extractedValue = PatternUtils.extractGroup(input, regex, group.name());
+        for (PatternGroup group : protocol.getGroupProtocols()) {
+            String extractedValue = PatternUtils.extractGroup(input, protocol.getPattern(), group.name());
             values.put(group, extractedValue);
         }
     }

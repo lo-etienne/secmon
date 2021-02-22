@@ -8,7 +8,7 @@ public final class ProtocolPatterns {
     public static final String DIGIT = "[0-9]";
     public static final String LETTER_DIGIT = LETTER + "|" + DIGIT;
     public static final String CRLF = "\\\\r\\\\n";
-    public static final String PORT = "([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])";
+    public static final String PORT = "(?<PORT>[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])";
     public static final String CHARACTER = "\\p{Print}";                    // "[\\x20-\\xFF]"  //Tous les character imprimable + espace
     public static final String CHARACTER_PASS = "\\p{Graph}";               // "[\\x21-\\xFF]"  //Tous les character imprimable
     public static final String SP = "\\p{Space}";                           // "[\\x20]"        //character espace

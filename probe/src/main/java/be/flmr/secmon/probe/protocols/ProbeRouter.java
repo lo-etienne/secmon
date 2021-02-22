@@ -1,6 +1,6 @@
 package be.flmr.secmon.probe.protocols;
 
-import be.flmr.secmon.core.DaemonProbeProtocolPatterns;
+import be.flmr.secmon.core.patterns.DaemonProbeProtocolPatterns;
 import be.flmr.secmon.core.router.AbstractRouter;
 import be.flmr.secmon.core.router.Group;
 import be.flmr.secmon.core.router.Protocol;

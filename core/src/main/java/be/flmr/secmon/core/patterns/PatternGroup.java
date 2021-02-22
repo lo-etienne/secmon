@@ -18,7 +18,10 @@ public enum PatternGroup {
     MESSAGE("(" + PatternGroup.CHARACTER + "){1,200}"),
     URL(PROTOCOL.getPattern() + "://" + "(" + USERNAME.getPattern() + "(:" + PASSWORD.getPattern()
             + ")?" + "@)?" + HOST.getPattern() + "(:" + PORT.getPattern() + ")?" + PATH.getPattern()),
-    AUGMENTEDURL(ID.getPattern() + "!" + URL.getPattern() + "!" + MIN.getPattern() + "!" + MAX.getPattern() + "!" + FREQUENCY.getPattern());
+    AUGMENTEDURL(ID.getPattern() + "!" + URL.getPattern() + "!" + MIN.getPattern() + "!" + MAX.getPattern() + "!" + FREQUENCY.getPattern()),
+    CONFIG("(" + PatternGroup.SP + PatternGroup.AUGMENTEDURL.getPattern() + "){0,100}"),
+    SRVLIST("(" + PatternGroup.SP + PatternGroup.ID.getPattern() + "){0,100}"),
+    OPTIONALMESSAGE("(" + PatternGroup.SP + "(" + PatternGroup.CHARACTER + "){1,200})?");
 
     public static final String LETTER = "[A-Za-z]";
     public static final String DIGIT = "[0-9]";

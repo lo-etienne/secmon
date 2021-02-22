@@ -47,7 +47,7 @@ public class ProtocolPatternsGestionnerTest {
     @ParameterizedTest
     @MethodSource("ADD_SERVICE_RESPONSECases")
     final void stringMatchesADD_SERVICE_RESPONSE(String s, boolean b) {
-        assertRegex(ProtocolPatternsGestionner.ADD_SERVICE_RESP.getPattern(), s, b);
+        assertRegex(ProtocolPatternsGestionner.ADD_SERVICE_RESP_OK.getPattern(), s, b);
     }
 
     final Stream<Arguments> LIST_SERVICE_REQUESTCases() {

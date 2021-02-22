@@ -3,51 +3,56 @@ package be.flmr.secmon.core.patterns;
 import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public enum ProtocolPatternsGestionner {
-    ADD_SERVICE_REQ("ADDSRV" + PatternGroup.SP + PatternGroup.AUGMENTEDURL + PatternGroup.CRLF),
-    ADD_SERVICE_RESP_OK("\\+OK" + "(" + PatternGroup.SP + PatternGroup.MESSAGE + ")?" + PatternGroup.CRLF),
-    ADD_SERVICE_RESP_ERR("-ERR" + "(" + PatternGroup.SP + PatternGroup.MESSAGE + ")?" + PatternGroup.CRLF),
-    LIST_SERVICE_REQ("LISTSRV" + PatternGroup.CRLF),
-    LIST_SERVICE_RESP("SRV(" + PatternGroup.SP + PatternGroup.ID + "){0,100}" + PatternGroup.CRLF),
-    STATE_SERVICE_REQ("STATESRV" + PatternGroup.SP + PatternGroup.ID + PatternGroup.CRLF),
-    STATE_SERVICE_RESP("STATE" + PatternGroup.SP + PatternGroup.ID + PatternGroup.SP + PatternGroup.URL
-            + PatternGroup.SP + PatternGroup.STATE + PatternGroup.CRLF),
+    ADD_SERVICE_REQ("ADDSRV", PatternGroup.AUGMENTEDURL),
+    ADD_SERVICE_RESP_OK("\\+OK", PatternGroup.OPTIONALMESSAGE),
+    ADD_SERVICE_RESP_ERR("-ERR", PatternGroup.OPTIONALMESSAGE),
+    LIST_SERVICE_REQ("LISTSRV"),
+    LIST_SERVICE_RESP("SRV", PatternGroup.SRVLIST),
+    STATE_SERVICE_REQ("STATESRV", PatternGroup.ID),
+    STATE_SERVICE_RESP("STATE", PatternGroup.ID, PatternGroup.URL, PatternGroup.STATE),
 
-    CONFIG("CURCONFIG(" + PatternGroup.SP + PatternGroup.AUGMENTEDURL + "){0,100}" + PatternGroup.CRLF),
-    STATE_REQ("STATEREQ" + PatternGroup.SP + PatternGroup.ID + PatternGroup.CRLF),
-    STATE_RESP("STATERESP" + PatternGroup.SP + PatternGroup.ID + PatternGroup.SP + PatternGroup.STATE + PatternGroup.CRLF),
+    CONFIG("CURCONFIG", PatternGroup.CONFIG),
+    STATE_REQ("STATEREQ", PatternGroup.ID),
+    STATE_RESP("STATERESP", PatternGroup.ID, PatternGroup.STATE),
 
-    ANNOUNCE("IAMHERE" + PatternGroup.SP + PatternGroup.PROTOCOL + PatternGroup.SP + PatternGroup.PORT + PatternGroup.CRLF),
-    NOTIFICATION("NOTIFY" + PatternGroup.SP + PatternGroup.PROTOCOL + PatternGroup.SP + PatternGroup.PORT + PatternGroup.CRLF);
+    ANNOUNCE("IAMHERE", PatternGroup.PROTOCOL, PatternGroup.PORT),
+    NOTIFICATION("NOTIFY", PatternGroup.PROTOCOL, PatternGroup.PORT);
 
-    private final String pattern;
+    private final String prefix;
     private final List<PatternGroup> groupProtocols;
 
-    ProtocolPatternsGestionner(String pattern) {
-        this.pattern = pattern;
-        this.groupProtocols = new ArrayList<>();
-        var matcher = Pattern.compile("\\(\\?<(?<group>\\w+)>.*\\)").matcher(pattern);
-        if (!matcher.matches()) throw new IllegalArgumentException();
-        while(matcher.find()){
-            groupProtocols.add(PatternGroup.valueOf(matcher.group("group")));
-        }
+    ProtocolPatternsGestionner(String prefix, PatternGroup... groups) {
+        this.prefix = prefix;
+        groupProtocols = List.of(groups);
+
     }
 
     public String getPattern() {
-        return this.pattern;
+        return prefix + groupProtocols.stream()
+                .filter(Objects::nonNull)
+                .map(PatternGroup::getPattern)
+                .reduce("" , (str, pattern) -> str + PatternGroup.SP + pattern) + PatternGroup.CRLF;
     }
 
     public List<PatternGroup> getGroupProtocols() {
         return ImmutableList.copyOf(groupProtocols);
     }
 
-    public static ProtocolPatternsGestionner getProtocol(String input) {
-        for (ProtocolPatternsGestionner protocol : ProtocolPatternsGestionner.values()) {
-            if (Pattern.compile(protocol.pattern).matcher(input).matches()) return protocol;
-        }
-        throw new IllegalArgumentException("Le paramettre ne correspont pas!");
+    public String buildMessage(List<String> values) {
+        return prefix + values.stream()
+                .filter(Objects::nonNull)
+                .reduce("", (str, value) -> str + " " + value) + "\r\n";
+    }
+
+    public static void main(String[] args) {
+        Arrays.stream(ProtocolPatternsGestionner.values())
+                .map(ProtocolPatternsGestionner::getPattern)
+                .forEach(System.out::println);
     }
 }

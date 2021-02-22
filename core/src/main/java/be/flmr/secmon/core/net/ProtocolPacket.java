@@ -4,9 +4,7 @@ import be.flmr.secmon.core.patterns.PatternGroup;
 import be.flmr.secmon.core.patterns.PatternUtils;
 import be.flmr.secmon.core.patterns.ProtocolPatternsGestionner;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ProtocolPacket {
     private Map<PatternGroup, String> values;
@@ -14,26 +12,49 @@ public class ProtocolPacket {
 
     public ProtocolPacket(){}
 
-    public ProtocolPacket(String input) {
-        values = new HashMap<>();
-        this.protocol = ProtocolPatternsGestionner.getProtocol(input);
-
-        for (PatternGroup group : protocol.getGroupProtocols()) {
-            String extractedValue = PatternUtils.extractGroup(input, protocol.getPattern(), group.name());
-            values.put(group, extractedValue);
-        }
-    }
-
     public String getValue(PatternGroup group) {
         return values.get(group);
     }
 
-    public String buildMessage(String substituted) {
+    public String buildMessage() {
+        List<PatternGroup> order = protocol.getGroupProtocols();
+        List<String> orderedValues = new ArrayList<>();
 
-        return null;
+        order.forEach(group -> {
+            values.forEach((key, value) -> {
+                if (group == key) orderedValues.add(value);
+            });
+        });
+
+        return protocol.buildMessage(orderedValues);
     }
 
     protected Map<PatternGroup, String> getValues() {
         return values;
+    }
+
+    public static void main(String[] args) {
+        ProtocolPacketBuilder builder = new ProtocolPacketBuilder();
+        var packet = builder.withType(ProtocolPatternsGestionner.STATE_RESP)
+//                .with(PatternGroup.AUGMENTEDURL)
+//                .with(PatternGroup.CONFIG)
+//                .with(PatternGroup.FREQUENCY)
+//                .with(PatternGroup.HOST)
+//                .with(PatternGroup.ID)
+//                .with(PatternGroup.MAX)
+//                .with(PatternGroup.MESSAGE)
+//                .with(PatternGroup.MIN)
+//                .with(PatternGroup.OPTIONALMESSAGE)
+//                .with(PatternGroup.PROTOCOL)
+//                .with(PatternGroup.PASSWORD)
+//                .with(PatternGroup.PATH)
+//                .with(PatternGroup.PORT)
+//                .with(PatternGroup.SRVLIST)
+//                .with(PatternGroup.STATE)
+//                .with(PatternGroup.URL)
+//                .with(PatternGroup.USERNAME)
+                .build();
+
+        System.out.println(packet.buildMessage());
     }
 }

@@ -1,32 +1,33 @@
 package be.flmr.secmon.core.patterns;
 
 import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public enum ProtocolPatternsGestionner {
-    ADD_SERVICE_REQ("ADDSRV" + ProtocolPatterns.SP + ProtocolPatterns.AUGMENTED_URL + ProtocolPatterns.CRLF),
-    ADD_SERVICE_RESP("(\\+OK|-ERR)" + "(" + ProtocolPatterns.SP + ProtocolPatterns.MESSAGE + ")?" + ProtocolPatterns.CRLF),
-    LIST_SERVICE_REQ("LISTSRV" + ProtocolPatterns.CRLF),
-    LIST_SERVICE_RESP("SRV(" + ProtocolPatterns.SP + ProtocolPatterns.ID + "){0,100}" + ProtocolPatterns.CRLF),
-    STATE_SERVICE_REQ("STATESRV" + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.CRLF),
-    STATE_SERVICE_RESP("STATE" + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.SP + ProtocolPatterns.URL
-            + ProtocolPatterns.SP + ProtocolPatterns.STATE + ProtocolPatterns.CRLF),
+    ADD_SERVICE_REQ("ADDSRV" + PatternGroup.SP + PatternGroup.AUGMENTEDURL + PatternGroup.CRLF),
+    ADD_SERVICE_RESP_OK("\\+OK" + "(" + PatternGroup.SP + PatternGroup.MESSAGE + ")?" + PatternGroup.CRLF),
+    ADD_SERVICE_RESP_ERR("-ERR" + "(" + PatternGroup.SP + PatternGroup.MESSAGE + ")?" + PatternGroup.CRLF),
+    LIST_SERVICE_REQ("LISTSRV" + PatternGroup.CRLF),
+    LIST_SERVICE_RESP("SRV(" + PatternGroup.SP + PatternGroup.ID + "){0,100}" + PatternGroup.CRLF),
+    STATE_SERVICE_REQ("STATESRV" + PatternGroup.SP + PatternGroup.ID + PatternGroup.CRLF),
+    STATE_SERVICE_RESP("STATE" + PatternGroup.SP + PatternGroup.ID + PatternGroup.SP + PatternGroup.URL
+            + PatternGroup.SP + PatternGroup.STATE + PatternGroup.CRLF),
 
-    CONFIG("CURCONFIG(" + ProtocolPatterns.SP + ProtocolPatterns.AUGMENTED_URL + "){0,100}" + ProtocolPatterns.CRLF),
-    STATE_REQ("STATEREQ" + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.CRLF),
-    STATE_RESP("STATERESP" + ProtocolPatterns.SP + ProtocolPatterns.ID + ProtocolPatterns.SP + ProtocolPatterns.STATE + ProtocolPatterns.CRLF),
+    CONFIG("CURCONFIG(" + PatternGroup.SP + PatternGroup.AUGMENTEDURL + "){0,100}" + PatternGroup.CRLF),
+    STATE_REQ("STATEREQ" + PatternGroup.SP + PatternGroup.ID + PatternGroup.CRLF),
+    STATE_RESP("STATERESP" + PatternGroup.SP + PatternGroup.ID + PatternGroup.SP + PatternGroup.STATE + PatternGroup.CRLF),
 
-    ANNOUNCE("IAMHERE" + ProtocolPatterns.SP + ProtocolPatterns.PROTOCOL + ProtocolPatterns.SP + ProtocolPatterns.PORT + ProtocolPatterns.CRLF),
-    NOTIFICATION("NOTIFY" + ProtocolPatterns.SP + ProtocolPatterns.PROTOCOL + ProtocolPatterns.SP + ProtocolPatterns.PORT + ProtocolPatterns.CRLF);
+    ANNOUNCE("IAMHERE" + PatternGroup.SP + PatternGroup.PROTOCOL + PatternGroup.SP + PatternGroup.PORT + PatternGroup.CRLF),
+    NOTIFICATION("NOTIFY" + PatternGroup.SP + PatternGroup.PROTOCOL + PatternGroup.SP + PatternGroup.PORT + PatternGroup.CRLF);
 
-    private String pattern;
-    private List<PatternGroup> groupProtocols;
+    private final String pattern;
+    private final List<PatternGroup> groupProtocols;
 
-    private ProtocolPatternsGestionner(String pattern) {
+    ProtocolPatternsGestionner(String pattern) {
+        this.pattern = pattern;
         this.groupProtocols = new ArrayList<>();
         var matcher = Pattern.compile("\\(\\?<(?<group>\\w+)>.*\\)").matcher(pattern);
         if (!matcher.matches()) throw new IllegalArgumentException();
@@ -39,7 +40,6 @@ public enum ProtocolPatternsGestionner {
         return this.pattern;
     }
 
-    @NotNull
     public List<PatternGroup> getGroupProtocols() {
         return ImmutableList.copyOf(groupProtocols);
     }

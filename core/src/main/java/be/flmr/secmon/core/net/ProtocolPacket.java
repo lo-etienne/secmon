@@ -12,6 +12,8 @@ public class ProtocolPacket {
     private Map<PatternGroup, String> values;
     private ProtocolPatternsGestionner protocol;
 
+    public ProtocolPacket(){}
+
     public ProtocolPacket(String input) {
         values = new HashMap<>();
         this.protocol = ProtocolPatternsGestionner.getProtocol(input);

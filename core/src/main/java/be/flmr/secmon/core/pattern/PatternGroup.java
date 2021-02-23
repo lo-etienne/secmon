@@ -1,10 +1,10 @@
-package be.flmr.secmon.core.patterns;
+package be.flmr.secmon.core.pattern;
 
 import java.util.Arrays;
 
-public enum PatternGroup {
+public enum PatternGroup implements IEnumPattern {
     SP("\\p{Space}", true),
-    CRLF("\\\\r\\\\n", true),
+    CRLF("\\r\\n", true),
 
     ID("(" + PatternGroup.LETTER_DIGIT + "){5,10}"),
     PROTOCOL("(" + PatternGroup.LETTER_DIGIT + "){3,15}"),
@@ -43,6 +43,7 @@ public enum PatternGroup {
         this(pattern, false);
     }
 
+    @Override
     public String getPattern() {
         return special ? pattern : String.format("(?<%s>%s)", name(), pattern);
     }

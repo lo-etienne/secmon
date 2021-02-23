@@ -1,15 +1,16 @@
-package be.flmr.secmon.core.patterns;
+package be.flmr.secmon.core.pattern;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
-import static be.flmr.secmon.core.patterns.PatternGroup.CRLF;
-import static be.flmr.secmon.core.patterns.PatternGroup.SP;
+import static be.flmr.secmon.core.pattern.PatternGroup.CRLF;
+import static be.flmr.secmon.core.pattern.PatternGroup.SP;
 
-public enum ProtocolPatternsGestionner {
+public enum ProtocolPattern implements IEnumPattern {
     ADD_SERVICE_REQ("ADDSRV", PatternGroup.AUGMENTEDURL),
     ADD_SERVICE_RESP_OK("\\+OK", false, PatternGroup.OPTIONALMESSAGE),
     ADD_SERVICE_RESP_ERR("-ERR", false, PatternGroup.OPTIONALMESSAGE),
@@ -30,25 +31,26 @@ public enum ProtocolPatternsGestionner {
     private final boolean automaticSpace;
     private final boolean automaticCRLF;
 
-    ProtocolPatternsGestionner(String prefix, boolean automaticSpace, boolean automaticCRLF, PatternGroup... groups) {
+    ProtocolPattern(String prefix, boolean automaticSpace, boolean automaticCRLF, PatternGroup... groups) {
         this.prefix = prefix;
         groupProtocols = List.of(groups);
         this.automaticCRLF = automaticCRLF;
         this.automaticSpace = automaticSpace;
     }
 
-    ProtocolPatternsGestionner(String prefix, boolean automaticSpace, PatternGroup... groups) {
+    ProtocolPattern(String prefix, boolean automaticSpace, PatternGroup... groups) {
         this(prefix, automaticSpace, true, groups);
     }
 
-    ProtocolPatternsGestionner(String prefix, PatternGroup... groups) {
+    ProtocolPattern(String prefix, PatternGroup... groups) {
         this(prefix, true, true, groups);
     }
 
+    @Override
     public String getPattern() {
         return prefix + groupProtocols.stream()
                 .filter(Objects::nonNull)
-                .map(PatternGroup::getPattern)
+                .map(IEnumPattern::getPattern)
                 .reduce("" , (ac, pattern) -> ac + (automaticSpace ? SP.getPattern() : "") + pattern)
                 + (automaticCRLF ? CRLF.getPattern() : "");
     }
@@ -63,9 +65,16 @@ public enum ProtocolPatternsGestionner {
                 .reduce("", (ac, value) -> ac + " " + value) + "\r\n";
     }
 
+    public static ProtocolPattern getProtocol(String input) {
+        for (ProtocolPattern protocol : ProtocolPattern.values()) {
+            if (Pattern.compile(protocol.getPattern()).matcher(input).matches()) return protocol;
+        }
+        throw new IllegalArgumentException(String.format("Le paramètre %s ne correspond à aucun patterns !", input));
+    }
+
     public static void main(String[] args) {
-        Arrays.stream(ProtocolPatternsGestionner.values())
-                .map(ProtocolPatternsGestionner::getPattern)
+        Arrays.stream(ProtocolPattern.values())
+                .map(ProtocolPattern::getPattern)
                 .forEach(System.out::println);
     }
 }

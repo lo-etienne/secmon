@@ -1,18 +1,26 @@
-package be.flmr.secmon.core.net;
-
-import be.flmr.secmon.core.patterns.PatternGroup;
-import be.flmr.secmon.core.patterns.PatternUtils;
-import be.flmr.secmon.core.patterns.ProtocolPatternsGestionner;
+package be.flmr.secmon.core.pattern;
 
 import java.util.*;
 
 public class ProtocolPacket {
-    private Map<PatternGroup, String> values;
-    private ProtocolPatternsGestionner protocol;
+    private Map<IEnumPattern, String> values;
+    private ProtocolPattern protocol;
 
-    public ProtocolPacket(){}
+    public ProtocolPacket() {}
 
-    public String getValue(PatternGroup group) {
+    public static ProtocolPacket from(String message) {
+        ProtocolPacket packet = new ProtocolPacket();
+        packet.values = new HashMap<>();
+        packet.protocol = ProtocolPattern.getProtocol(message);
+
+        for (PatternGroup group : packet.protocol.getGroupProtocols()) {
+            String extractedValue = PatternUtils.extractGroup(message, packet.protocol.getPattern(), group.name());
+            packet.values.put(group, extractedValue);
+        }
+        return packet;
+    }
+
+    public String getValue(IEnumPattern group) {
         return values.get(group);
     }
 
@@ -29,17 +37,16 @@ public class ProtocolPacket {
         return protocol.buildMessage(orderedValues);
     }
 
-    protected Map<PatternGroup, String> getValues() {
+    protected Map<IEnumPattern, String> getValues() {
         return values;
     }
 
     public static void main(String[] args) {
-
-        Arrays.stream(ProtocolPatternsGestionner.values())
+        Arrays.stream(ProtocolPattern.values())
                 .forEach(ProtocolPacket::displayGroup);
     }
 
-    private static void displayGroup(ProtocolPatternsGestionner group) {
+    private static void displayGroup(ProtocolPattern group) {
         ProtocolPacketBuilder builder = new ProtocolPacketBuilder();
 
         var packet = builder.withType(group)

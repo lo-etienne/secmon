@@ -1,4 +1,4 @@
-package be.flmr.secmon.core.patterns;
+package be.flmr.secmon.core.pattern;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

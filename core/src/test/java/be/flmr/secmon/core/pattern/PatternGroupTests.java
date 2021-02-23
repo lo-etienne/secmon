@@ -1,6 +1,6 @@
-package be.flmr.secmon.core;
+package be.flmr.secmon.core.pattern;
 
-import be.flmr.secmon.core.patterns.PatternGroup;
+import be.flmr.secmon.core.pattern.PatternGroup;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

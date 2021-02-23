@@ -1,12 +1,11 @@
 package be.flmr.secmon.core.router;
 
-import be.flmr.secmon.core.patterns.PatternUtils;
+import be.flmr.secmon.core.pattern.PatternUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public abstract class AbstractRouter {
     private Map<Method, String> protocols;

@@ -1,14 +1,11 @@
-package be.flmr.secmon.core.net;
-
-import be.flmr.secmon.core.patterns.PatternGroup;
-import be.flmr.secmon.core.patterns.ProtocolPatternsGestionner;
+package be.flmr.secmon.core.pattern;
 
 import java.util.HashMap;
 
-public class ProtocolPacketBuilder implements IProtocolPacketBuilder{
+public class ProtocolPacketBuilder implements IProtocolPacketBuilder {
 
-    private ProtocolPatternsGestionner typeProtocol;
-    private HashMap<PatternGroup, String> groupWithVal = new HashMap<PatternGroup, String>();
+    private IEnumPattern typeProtocol;
+    private HashMap<IEnumPattern, String> groupWithVal = new HashMap<>();
 
     @Override
     public ProtocolPacket build() {
@@ -26,22 +23,20 @@ public class ProtocolPacketBuilder implements IProtocolPacketBuilder{
             fieldMap.set(packet,groupWithVal);
             fieldMap.setAccessible(false);
 
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return packet;
     }
 
     @Override
-    public IProtocolPacketBuilder with(PatternGroup group, String value) {
+    public IProtocolPacketBuilder with(IEnumPattern group, String value) {
         groupWithVal.put(group, value);
         return this;
     }
 
     @Override
-    public IProtocolPacketBuilder withType(ProtocolPatternsGestionner type) {
+    public IProtocolPacketBuilder withType(IEnumPattern type) {
         this.typeProtocol = type;
         return this;
     }

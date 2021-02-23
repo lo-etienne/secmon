@@ -1,5 +1,7 @@
 package be.flmr.secmon.core.net;
 
+import be.flmr.secmon.core.pattern.ProtocolPacket;
+
 import java.util.concurrent.TimeUnit;
 
 public interface IIntervalProtocolPacketSender {

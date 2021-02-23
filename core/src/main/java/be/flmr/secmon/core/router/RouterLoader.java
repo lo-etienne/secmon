@@ -1,5 +1,6 @@
 package be.flmr.secmon.core.router;
 
+import be.flmr.secmon.core.pattern.ProtocolPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public class RouterLoader {
             throw new RuntimeException("Problème lors de la création de l'instance du Constructeur.", e);
         }
 
-        final Map<Method, String> protocols = new HashMap<>();
+        final Map<Method, ProtocolPattern> protocols = new HashMap<>();
 
         if (type.getAnnotation(Router.class) == null)
             log.warn("La classe " + type.getName() + " n'est pas annotée avec l'annotation 'Router'. Il est conseillé de l'annoter.");

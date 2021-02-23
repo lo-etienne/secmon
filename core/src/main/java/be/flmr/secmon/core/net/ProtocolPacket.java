@@ -34,25 +34,32 @@ public class ProtocolPacket {
     }
 
     public static void main(String[] args) {
+
+        Arrays.stream(ProtocolPatternsGestionner.values())
+                .forEach(ProtocolPacket::displayGroup);
+    }
+
+    private static void displayGroup(ProtocolPatternsGestionner group) {
         ProtocolPacketBuilder builder = new ProtocolPacketBuilder();
-        var packet = builder.withType(ProtocolPatternsGestionner.STATE_RESP)
-//                .with(PatternGroup.AUGMENTEDURL)
-//                .with(PatternGroup.CONFIG)
-//                .with(PatternGroup.FREQUENCY)
-//                .with(PatternGroup.HOST)
-//                .with(PatternGroup.ID)
-//                .with(PatternGroup.MAX)
-//                .with(PatternGroup.MESSAGE)
-//                .with(PatternGroup.MIN)
-//                .with(PatternGroup.OPTIONALMESSAGE)
-//                .with(PatternGroup.PROTOCOL)
-//                .with(PatternGroup.PASSWORD)
-//                .with(PatternGroup.PATH)
-//                .with(PatternGroup.PORT)
-//                .with(PatternGroup.SRVLIST)
-//                .with(PatternGroup.STATE)
-//                .with(PatternGroup.URL)
-//                .with(PatternGroup.USERNAME)
+
+        var packet = builder.withType(group)
+                .with(PatternGroup.AUGMENTEDURL, PatternGroup.AUGMENTEDURL.name())
+                .with(PatternGroup.CONFIG, PatternGroup.CONFIG.name())
+                .with(PatternGroup.FREQUENCY, PatternGroup.FREQUENCY.name())
+                .with(PatternGroup.HOST, PatternGroup.HOST.name())
+                .with(PatternGroup.ID, PatternGroup.ID.name())
+                .with(PatternGroup.MAX, PatternGroup.MAX.name())
+                .with(PatternGroup.MESSAGE, PatternGroup.MESSAGE.name())
+                .with(PatternGroup.MIN, PatternGroup.MIN.name())
+                .with(PatternGroup.OPTIONALMESSAGE, PatternGroup.OPTIONALMESSAGE.name())
+                .with(PatternGroup.PROTOCOL, PatternGroup.PROTOCOL.name())
+                .with(PatternGroup.PASSWORD, PatternGroup.PASSWORD.name())
+                .with(PatternGroup.PATH, PatternGroup.PATH.name())
+                .with(PatternGroup.PORT, PatternGroup.PORT.name())
+                .with(PatternGroup.SRVLIST, PatternGroup.SRVLIST.name())
+                .with(PatternGroup.STATE, PatternGroup.STATE.name())
+                .with(PatternGroup.URL, PatternGroup.URL.name())
+                .with(PatternGroup.USERNAME, PatternGroup.USERNAME.name())
                 .build();
 
         System.out.println(packet.buildMessage());

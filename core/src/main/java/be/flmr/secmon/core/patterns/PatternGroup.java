@@ -1,9 +1,11 @@
 package be.flmr.secmon.core.patterns;
 
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 public enum PatternGroup {
+    SP("\\p{Space}", true),
+    CRLF("\\\\r\\\\n", true),
+
     ID("(" + PatternGroup.LETTER_DIGIT + "){5,10}"),
     PROTOCOL("(" + PatternGroup.LETTER_DIGIT + "){3,15}"),
     USERNAME("(" + PatternGroup.LETTER_DIGIT + "){3,50}"),
@@ -19,26 +21,30 @@ public enum PatternGroup {
     URL(PROTOCOL.getPattern() + "://" + "(" + USERNAME.getPattern() + "(:" + PASSWORD.getPattern()
             + ")?" + "@)?" + HOST.getPattern() + "(:" + PORT.getPattern() + ")?" + PATH.getPattern()),
     AUGMENTEDURL(ID.getPattern() + "!" + URL.getPattern() + "!" + MIN.getPattern() + "!" + MAX.getPattern() + "!" + FREQUENCY.getPattern()),
-    CONFIG("(" + PatternGroup.SP + PatternGroup.AUGMENTEDURL.getPattern() + "){0,100}"),
-    SRVLIST("(" + PatternGroup.SP + PatternGroup.ID.getPattern() + "){0,100}"),
-    OPTIONALMESSAGE("(" + PatternGroup.SP + "(" + PatternGroup.CHARACTER + "){1,200})?");
+    CONFIG("(" + SP.getPattern() + PatternGroup.AUGMENTEDURL.getPattern() + "){0,100}"),
+    SRVLIST("(" + SP.getPattern() + PatternGroup.ID.getPattern() + "){0,100}"),
+    OPTIONALMESSAGE("(" + SP.getPattern() + "(" + PatternGroup.CHARACTER + "){1,200})?");
 
     public static final String LETTER = "[A-Za-z]";
     public static final String DIGIT = "[0-9]";
     public static final String LETTER_DIGIT = LETTER + "|" + DIGIT;
-    public static final String CRLF = "\\\\r\\\\n";
     public static final String CHARACTER = "\\p{Print}";                    // "[\\x20-\\xFF]"  //Tous les character imprimable + espace
     public static final String CHARACTER_PASS = "\\p{Graph}";               // "[\\x21-\\xFF]"  //Tous les character imprimable
-    public static final String SP = "\\p{Space}";
 
     private String pattern;
+    private boolean special;
 
-    PatternGroup(String pattern){
+    PatternGroup(String pattern, boolean special) {
         this.pattern = pattern;
+        this.special = special;
+    }
+
+    PatternGroup(String pattern) {
+        this(pattern, false);
     }
 
     public String getPattern() {
-        return String.format("(?<%s>%s)", name(), pattern);
+        return special ? pattern : String.format("(?<%s>%s)", name(), pattern);
     }
 
     public static void main(String[] args) {

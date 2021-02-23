@@ -38,8 +38,8 @@ public class ProtocolPatternsGestionnerTest {
                 Arguments.of("", false),
                 Arguments.of("+OK\\r\\n", true),
                 Arguments.of("+OK Les pommes sont magiques\\r\\n", true),
-                Arguments.of("-ERR\\r\\n", true),
-                Arguments.of("-ERR Les pommes sont magiques\\r\\n", true),
+                Arguments.of("-ERR\\r\\n", false),
+                Arguments.of("-ERR Les pommes sont magiques\\r\\n", false),
                 Arguments.of("POMME", false)
         );
     }
@@ -48,6 +48,23 @@ public class ProtocolPatternsGestionnerTest {
     @MethodSource("ADD_SERVICE_RESPONSECases")
     final void stringMatchesADD_SERVICE_RESPONSE(String s, boolean b) {
         assertRegex(ProtocolPatternsGestionner.ADD_SERVICE_RESP_OK.getPattern(), s, b);
+    }
+
+    final Stream<Arguments> ADD_SERVICE_RESPONSE_ERRCases() {
+        return Stream.of(
+                Arguments.of("", false),
+                Arguments.of("+OK\\r\\n", false),
+                Arguments.of("+OK Les pommes sont magiques\\r\\n", false),
+                Arguments.of("-ERR\\r\\n", true),
+                Arguments.of("-ERR Les pommes sont magiques\\r\\n", true),
+                Arguments.of("POMME", false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("ADD_SERVICE_RESPONSE_ERRCases")
+    final void stringMatchesADD_SERVICE_RESPONSE_ERR(String s, boolean b) {
+        assertRegex(ProtocolPatternsGestionner.ADD_SERVICE_RESP_ERR.getPattern(), s, b);
     }
 
     final Stream<Arguments> LIST_SERVICE_REQUESTCases() {

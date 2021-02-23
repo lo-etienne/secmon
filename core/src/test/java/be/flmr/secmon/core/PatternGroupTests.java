@@ -93,7 +93,7 @@ public class PatternGroupTests {
     @ParameterizedTest
     @MethodSource("crlfCases")
     final void stringMatchesCRLF(String s, boolean b) {
-        assertRegex(PatternGroup.CRLF, s, b);
+        assertRegex(PatternGroup.CRLF.getPattern(), s, b);
     }
 
     final Stream<Arguments> portCases() {
@@ -246,7 +246,7 @@ public class PatternGroupTests {
     @ParameterizedTest
     @MethodSource("SPCases")
     final void stringMatchesSP(String s, boolean b) {
-        assertRegex(PatternGroup.SP, s, b);
+        assertRegex(PatternGroup.SP.getPattern(), s, b);
     }
 
     final Stream<Arguments> IDCases() {

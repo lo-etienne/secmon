@@ -84,9 +84,9 @@ public class PatternGroupTests {
     final Stream<Arguments> crlfCases() {
         return Stream.of(
                 Arguments.of("", false),
-                Arguments.of("\\r", false),
-                Arguments.of("\\n", false),
-                Arguments.of("\\r\\n", true)
+                Arguments.of("\r", false),
+                Arguments.of("\n", false),
+                Arguments.of("\r\n", true)
         );
     }
 

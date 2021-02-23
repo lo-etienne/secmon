@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 @ExtendWith(MockitoExtension.class)
 public class ProtocolPacketTest {
-    private ProtocolPacket packet;
+    private IProtocolPacket packet;
 
     @Test
     final void createsAMessageFromValues() {

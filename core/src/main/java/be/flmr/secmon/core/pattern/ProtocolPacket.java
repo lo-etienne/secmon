@@ -2,7 +2,7 @@ package be.flmr.secmon.core.pattern;
 
 import java.util.*;
 
-public class ProtocolPacket {
+public class ProtocolPacket implements IProtocolPacket {
     private Map<IEnumPattern, String> values;
     private ProtocolPattern protocol;
 
@@ -20,10 +20,12 @@ public class ProtocolPacket {
         return packet;
     }
 
+    @Override
     public String getValue(IEnumPattern group) {
         return values.get(group);
     }
 
+    @Override
     public String buildMessage() {
         List<PatternGroup> order = protocol.getGroupProtocols();
         List<String> orderedValues = new ArrayList<>();

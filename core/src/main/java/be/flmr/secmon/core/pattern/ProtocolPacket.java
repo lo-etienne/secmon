@@ -2,12 +2,22 @@ package be.flmr.secmon.core.pattern;
 
 import java.util.*;
 
+/**
+ * Classe "data" contenant les données d'un message reçu ou d'un message à envoyer. Permet de construire un message à
+ * partir de données, tel que PORT: 161 ou alors PROTOCOL: snmp. Et permet de construire des données à partir d'un
+ * message, tel que IAMHERE snmp 161.
+ */
 public class ProtocolPacket implements IProtocolPacket {
     private Map<IEnumPattern, String> values;
     private ProtocolPattern protocol;
 
     public ProtocolPacket() {}
 
+    /**
+     * Crée une instance de {@link ProtocolPacket} à partir d'un message.
+     * @param message le message (i.e. {@code IAMHERE snmp 161})
+     * @return l'instance de protocol pattern avec les valeurs spécifiées.
+     */
     public static ProtocolPacket from(String message) {
         ProtocolPacket packet = new ProtocolPacket();
         packet.values = new HashMap<>();
@@ -20,57 +30,46 @@ public class ProtocolPacket implements IProtocolPacket {
         return packet;
     }
 
+    /**
+     * Renvoie la valeur d'un groupe. (i.e. {@code getValue({@link PatternGroup.PORT}) -> 161}
+     * @param group le type de valeur (i.e. {@link PatternGroup.PORT}
+     * @return sa valeur (i.e. 161)
+     */
     @Override
     public String getValue(IEnumPattern group) {
         return values.get(group);
     }
 
     @Override
+    public void setValue(IEnumPattern pattern, String value) {
+        values.put(pattern, value);
+    }
+
+    /**
+     * Construit le message du packet à partir de valeurs.
+     * @return le message (i.e. IAMHERE snmp 161)
+     * @throws NullPointerException si une valeur de groupe n'as pas été spécifiée (même si elle est vide).
+     */
+    @Override
     public String buildMessage() {
         List<PatternGroup> order = protocol.getGroupProtocols();
         List<String> orderedValues = new ArrayList<>();
 
-        order.forEach(group -> {
-            values.forEach((key, value) -> {
-                if (group == key) orderedValues.add(value);
-            });
-        });
+        for (PatternGroup group : order) {
+            String value = values.get(group);
+            if (value == null)
+                throw new NullPointerException("La valeur pour le groupe " + group + " est nulle. Veuillez la spécifier même si elle doit être vide.");
+            orderedValues.add(value);
+        }
 
         return protocol.buildMessage(orderedValues);
     }
 
+    /**
+     * Renvoie la map des valeurs
+     * @return la map des valeurs
+     */
     protected Map<IEnumPattern, String> getValues() {
         return values;
-    }
-
-    public static void main(String[] args) {
-        Arrays.stream(ProtocolPattern.values())
-                .forEach(ProtocolPacket::displayGroup);
-    }
-
-    private static void displayGroup(ProtocolPattern group) {
-        ProtocolPacketBuilder builder = new ProtocolPacketBuilder();
-
-        var packet = builder.withType(group)
-                .with(PatternGroup.AUGMENTEDURL, PatternGroup.AUGMENTEDURL.name())
-                .with(PatternGroup.CONFIG, PatternGroup.CONFIG.name())
-                .with(PatternGroup.FREQUENCY, PatternGroup.FREQUENCY.name())
-                .with(PatternGroup.HOST, PatternGroup.HOST.name())
-                .with(PatternGroup.ID, PatternGroup.ID.name())
-                .with(PatternGroup.MAX, PatternGroup.MAX.name())
-                .with(PatternGroup.MESSAGE, PatternGroup.MESSAGE.name())
-                .with(PatternGroup.MIN, PatternGroup.MIN.name())
-                .with(PatternGroup.OPTIONALMESSAGE, PatternGroup.OPTIONALMESSAGE.name())
-                .with(PatternGroup.PROTOCOL, PatternGroup.PROTOCOL.name())
-                .with(PatternGroup.PASSWORD, PatternGroup.PASSWORD.name())
-                .with(PatternGroup.PATH, PatternGroup.PATH.name())
-                .with(PatternGroup.PORT, PatternGroup.PORT.name())
-                .with(PatternGroup.SRVLIST, PatternGroup.SRVLIST.name())
-                .with(PatternGroup.STATE, PatternGroup.STATE.name())
-                .with(PatternGroup.URL, PatternGroup.URL.name())
-                .with(PatternGroup.USERNAME, PatternGroup.USERNAME.name())
-                .build();
-
-        System.out.println(packet.buildMessage());
     }
 }

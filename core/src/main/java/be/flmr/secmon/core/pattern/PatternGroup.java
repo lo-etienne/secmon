@@ -2,6 +2,10 @@ package be.flmr.secmon.core.pattern;
 
 import java.util.Arrays;
 
+/**
+ * Énumération comprenant les différents "groupes" de patterns défninis dans les "définitions standards". Ces "groupes"
+ * représentent, pour la majorité, des patterns "groupés" (i.e. (?<nom de groupe>*pattern*)).
+ */
 public enum PatternGroup implements IEnumPattern {
     SP("\\p{Space}", true),
     CRLF("\\r\\n", true),
@@ -31,7 +35,15 @@ public enum PatternGroup implements IEnumPattern {
     public static final String CHARACTER = "\\p{Print}";                    // "[\\x20-\\xFF]"  //Tous les character imprimable + espace
     public static final String CHARACTER_PASS = "\\p{Graph}";               // "[\\x21-\\xFF]"  //Tous les character imprimable
 
+    /**
+     * Le pattern interne au groupe
+     */
     private String pattern;
+
+    /**
+     * Si le groupe est "spécial" ou non. Cela permet d'ajouter SP et CRLF dans les "groupes" sans qu'ils aient des
+     * noms de groupe regex, ce qui lèvra une erreur lors de {@code Pattern::compile}
+     */
     private boolean special;
 
     PatternGroup(String pattern, boolean special) {
@@ -43,12 +55,13 @@ public enum PatternGroup implements IEnumPattern {
         this(pattern, false);
     }
 
+    /**
+     * Construit le pattern à partir du pattern interne à l'instance de l'énum. Le nom du groupe est le nom de la
+     * constante énumérée
+     * @return le pattern de l'instance de l'énum
+     */
     @Override
     public String getPattern() {
         return special ? pattern : String.format("(?<%s>%s)", name(), pattern);
-    }
-
-    public static void main(String[] args) {
-        Arrays.stream(PatternGroup.values()).map(PatternGroup::getPattern).forEach(System.out::println);
     }
 }

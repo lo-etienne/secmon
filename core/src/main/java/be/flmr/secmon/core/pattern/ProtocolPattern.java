@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
 import static be.flmr.secmon.core.pattern.PatternGroup.CRLF;
 import static be.flmr.secmon.core.pattern.PatternGroup.SP;
 
+/**
+ * Énumération regroupant les différentes définitions des patterns utilisés par l'application
+ */
 public enum ProtocolPattern implements IEnumPattern {
     ADD_SERVICE_REQ("ADDSRV", PatternGroup.AUGMENTEDURL),
     ADD_SERVICE_RESP_OK("\\+OK", false, PatternGroup.OPTIONALMESSAGE),
@@ -46,6 +49,10 @@ public enum ProtocolPattern implements IEnumPattern {
         this(prefix, true, true, groups);
     }
 
+    /**
+     * Retourne le pattern de l'instance créés de façon "lazy" grâce aux PatternGroups.
+     * @return le pattern de l'instance
+     */
     @Override
     public String getPattern() {
         return prefix + groupProtocols.stream()
@@ -55,26 +62,34 @@ public enum ProtocolPattern implements IEnumPattern {
                 + (automaticCRLF ? CRLF.getPattern() : "");
     }
 
+    /**
+     * Retourne les différents groupes utilisés par le pattern en particulier
+     * @return une liste des groupes utilisés par le pattern
+     */
     public List<PatternGroup> getGroupProtocols() {
         return ImmutableList.copyOf(groupProtocols);
     }
 
+    /**
+     * Construit le message en substituant les groupes par leur valeurs.
+     * @param values la liste des valeurs dans l'ordre
+     * @return le message à envoyer.
+     */
     public String buildMessage(List<String> values) {
         return prefix + values.stream()
                 .filter(Objects::nonNull)
                 .reduce("", (ac, value) -> ac + " " + value) + "\r\n";
     }
 
+    /**
+     * Détecte à quel protocol l'input appartient
+     * @param input un message reçu
+     * @return le protocol auquel l'input appartient.
+     */
     public static ProtocolPattern getProtocol(String input) {
         for (ProtocolPattern protocol : ProtocolPattern.values()) {
-            if (Pattern.compile(protocol.getPattern()).matcher(input).matches()) return protocol;
+            if (input.matches(protocol.getPattern())) return protocol;
         }
         throw new IllegalArgumentException(String.format("Le paramètre %s ne correspond à aucun patterns !", input));
-    }
-
-    public static void main(String[] args) {
-        Arrays.stream(ProtocolPattern.values())
-                .map(ProtocolPattern::getPattern)
-                .forEach(System.out::println);
     }
 }

@@ -1,5 +1,7 @@
 package be.flmr.secmon.core.router;
 
+import be.flmr.secmon.core.pattern.PatternGroup;
+import be.flmr.secmon.core.pattern.ProtocolPattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,13 +22,13 @@ public class RouterTest {
 
     @Test
     final void executesMethodWhenRegexMatches() {
-        router.execute("HELLO world");
+        router.execute("IAMHERE world 142\r\n");
         assertThat(verify, equalTo(true));
     }
 
     @Test
     final void passesGroupedParameterAsAnnotatedParameter() {
-        router.execute("HELLO world");
+        router.execute("IAMHERE world 123\r\n");
         assertThat(parameter, equalTo("world"));
     }
 
@@ -37,8 +39,8 @@ public class RouterTest {
     }
 
     private static class RouterStub extends AbstractRouter {
-        @Protocol(pattern = "HELLO (?<world>\\w+)")
-        public void hello(@Group(groupName = "world") String world) {
+        @Protocol(pattern = ProtocolPattern.ANNOUNCE)
+        public void hello(@Group(group = PatternGroup.PROTOCOL) String world) {
             verify = true;
             parameter = world;
         }

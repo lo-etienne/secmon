@@ -1,20 +1,21 @@
 package be.flmr.secmon.core.router;
 
-import be.flmr.secmon.core.patterns.PatternUtils;
+import be.flmr.secmon.core.pattern.PatternUtils;
+import be.flmr.secmon.core.pattern.ProtocolPacket;
+import be.flmr.secmon.core.pattern.ProtocolPattern;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public abstract class AbstractRouter {
-    private Map<Method, String> protocols;
+    private Map<Method, ProtocolPattern> protocols;
 
     public void execute(String input) {
-        for (Map.Entry<Method, String> entry : protocols.entrySet()) {
+        for (Map.Entry<Method, ProtocolPattern> entry : protocols.entrySet()) {
             Method method = entry.getKey();
-            String regex = entry.getValue();
+            ProtocolPattern pattern = entry.getValue();
 
             final var parameters = method.getParameters();
             if (Arrays.stream(parameters).anyMatch(p -> p.getAnnotation(Group.class) == null))
@@ -22,13 +23,13 @@ public abstract class AbstractRouter {
 
             final var matches = new String[parameters.length];
 
-            if (input.matches(regex)) {
+            if (input.matches(pattern.getPattern())) {
                 for (int i = 0; i < parameters.length; i++) {
                     final var parameter = parameters[i];
                     final var annotation = parameter.getAnnotation(Group.class);
 
                     try {
-                        matches[i] = PatternUtils.extractGroup(input, regex, annotation.groupName());
+                        matches[i] = PatternUtils.extractGroup(input, pattern.getPattern(), annotation.group().name());
                     } catch (IllegalArgumentException e) {
                         if (annotation.nullable())
                             matches[i] = null; // Quand le groupe n'est pas présent dans la regex, le string par défaut est null

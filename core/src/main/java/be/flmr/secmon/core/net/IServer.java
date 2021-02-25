@@ -1,10 +1,6 @@
 package be.flmr.secmon.core.net;
 
-public interface IServer extends Runnable {
+public interface IServer {
     void listenForConnections();
-
-    @Override
-    default void run() {
-        listenForConnections();
-    }
+    boolean isShuttingDown();
 }

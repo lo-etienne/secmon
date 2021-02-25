@@ -10,6 +10,7 @@ import java.util.*;
 public class ProtocolPacket implements IProtocolPacket {
     private Map<IEnumPattern, String> values;
     private ProtocolPattern protocol;
+    private String message;
 
     public ProtocolPacket() {}
 
@@ -20,6 +21,7 @@ public class ProtocolPacket implements IProtocolPacket {
      */
     public static ProtocolPacket from(String message) {
         ProtocolPacket packet = new ProtocolPacket();
+        packet.message = message;
         packet.values = new HashMap<>();
         packet.protocol = ProtocolPattern.getProtocol(message);
 
@@ -62,7 +64,17 @@ public class ProtocolPacket implements IProtocolPacket {
             orderedValues.add(value);
         }
 
-        return protocol.buildMessage(orderedValues);
+        return (message = protocol.buildMessage(orderedValues));
+    }
+
+    @Override
+    public IEnumPattern getType() {
+        return protocol;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 
     /**

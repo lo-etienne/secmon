@@ -1,0 +1,7 @@
+{
+  "name": "Hello world !",
+  "version": "6.9.0",
+  "multicast_address" : "127.0.0.1",
+  "multicast_port" : "42069",
+  "aes_key": "aeskey"
+}

@@ -1,5 +1,6 @@
-package be.flmr.secmon.core;
+package be.flmr.secmon.core.pattern;
 
+import be.flmr.secmon.core.pattern.PatternGroup;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,7 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProtocolPatternsTests {
+public class PatternGroupTests {
 
     final Stream<Arguments> letterCases() {
         return Stream.of(
@@ -30,7 +31,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("letterCases")
     final void letterPatternMatchesAllAlphabeticalCharacters(char c, boolean b) {
-        assertRegex(ProtocolPatterns.LETTER, String.format("%c", c), b);
+        assertRegex(PatternGroup.LETTER, String.format("%c", c), b);
     }
 
     final Stream<Arguments> digitCases() {
@@ -56,7 +57,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("digitCases")
     final void digitPatternMatchesAllDigits(char c, boolean b) {
-        assertRegex(ProtocolPatterns.DIGIT, String.format("%c", c), b);
+        assertRegex(PatternGroup.DIGIT, String.format("%c", c), b);
     }
 
     final Stream<Arguments> alphanumericalCases() {
@@ -77,22 +78,22 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("alphanumericalCases")
     final void letterDigitMatchesAlphanumericals(char c, boolean b) {
-        assertRegex(ProtocolPatterns.LETTER_DIGIT, String.format("%c", c), b);
+        assertRegex(PatternGroup.LETTER_DIGIT, String.format("%c", c), b);
     }
 
     final Stream<Arguments> crlfCases() {
         return Stream.of(
                 Arguments.of("", false),
-                Arguments.of("\\r", false),
-                Arguments.of("\\n", false),
-                Arguments.of("\\r\\n", true)
+                Arguments.of("\r", false),
+                Arguments.of("\n", false),
+                Arguments.of("\r\n", true)
         );
     }
 
     @ParameterizedTest
     @MethodSource("crlfCases")
     final void stringMatchesCRLF(String s, boolean b) {
-        assertRegex(ProtocolPatterns.CRLF, s, b);
+        assertRegex(PatternGroup.CRLF.getPattern(), s, b);
     }
 
     final Stream<Arguments> portCases() {
@@ -125,7 +126,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("portCases")
     final void stringMatchesPortNumber(String s, boolean b) {
-        assertRegex(ProtocolPatterns.PORT, s, b);
+        assertRegex(PatternGroup.PORT.getPattern(), s, b);
     }
 
     final Stream<Arguments> characterCases() {
@@ -174,7 +175,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("characterCases")
     final void stringMatchesCharacter(String s, boolean b) {
-        assertRegex(ProtocolPatterns.CHARACTER, s, b);
+        assertRegex(PatternGroup.CHARACTER, s, b);
     }
 
     final Stream<Arguments> character_passCases() {
@@ -223,7 +224,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("character_passCases")
     final void stringMatchesCharacter_pass(String s, boolean b) {
-        assertRegex(ProtocolPatterns.CHARACTER_PASS, s, b);
+        assertRegex(PatternGroup.CHARACTER_PASS, s, b);
     }
 
     final Stream<Arguments> SPCases() {
@@ -245,7 +246,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("SPCases")
     final void stringMatchesSP(String s, boolean b) {
-        assertRegex(ProtocolPatterns.SP, s, b);
+        assertRegex(PatternGroup.SP.getPattern(), s, b);
     }
 
     final Stream<Arguments> IDCases() {
@@ -280,7 +281,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("IDCases")
     final void stringMatchesID(String s, boolean b) {
-        assertRegex(ProtocolPatterns.ID, s, b);
+        assertRegex(PatternGroup.ID.getPattern(), s, b);
     }
 
     final Stream<Arguments> PROTOCOLCases() {
@@ -321,7 +322,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("PROTOCOLCases")
     final void stringMatchesPROTOCOL(String s, boolean b) {
-        assertRegex(ProtocolPatterns.PROTOCOL, s, b);
+        assertRegex(PatternGroup.PROTOCOL.getPattern(), s, b);
     }
 
     final Stream<Arguments> USERNAMECases() {
@@ -350,7 +351,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("USERNAMECases")
     final void stringMatchesUSERNAME(String s, boolean b) {
-        assertRegex(ProtocolPatterns.USERNAME, s, b);
+        assertRegex(PatternGroup.USERNAME.getPattern(), s, b);
     }
 
     final Stream<Arguments> PASSWORDCases() {
@@ -380,7 +381,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("PASSWORDCases")
     final void stringMatchesPASSWORD(String s, boolean b) {
-        assertRegex(ProtocolPatterns.PASSWORD, s, b);
+        assertRegex(PatternGroup.PASSWORD.getPattern(), s, b);
     }
 
     final Stream<Arguments> HOSTCases() {
@@ -410,7 +411,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("HOSTCases")
     final void stringMatchesHOST(String s, boolean b) {
-        assertRegex(ProtocolPatterns.HOST, s, b);
+        assertRegex(PatternGroup.HOST.getPattern(), s, b);
     }
 
     final Stream<Arguments> PATHCases() {
@@ -441,7 +442,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("PATHCases")
     final void stringMatchesPATH(String s, boolean b) {
-        assertRegex(ProtocolPatterns.PATH, s, b);
+        assertRegex(PatternGroup.PATH.getPattern(), s, b);
     }
 
     final Stream<Arguments> URLCases() {
@@ -459,7 +460,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("URLCases")
     final void stringMatchesURL(String s, boolean b) {
-        assertRegex(ProtocolPatterns.URL, s, b);
+        assertRegex(PatternGroup.URL.getPattern(), s, b);
     }
 
     final Stream<Arguments> MINCases() {
@@ -476,7 +477,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("MINCases")
     final void stringMatchesMIN(String s, boolean b) {
-        assertRegex(ProtocolPatterns.MIN, s, b);
+        assertRegex(PatternGroup.MIN.getPattern(), s, b);
     }
 
     final Stream<Arguments> MAXCases() {
@@ -493,7 +494,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("MAXCases")
     final void stringMatchesMAX(String s, boolean b) {
-        assertRegex(ProtocolPatterns.MAX, s, b);
+        assertRegex(PatternGroup.MAX.getPattern(), s, b);
     }
 
     final Stream<Arguments> FREQUENCYCases() {
@@ -510,7 +511,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("FREQUENCYCases")
     final void stringMatchesFREQUENCY(String s, boolean b) {
-        assertRegex(ProtocolPatterns.FREQUENCY, s, b);
+        assertRegex(PatternGroup.FREQUENCY.getPattern(), s, b);
     }
 
     final Stream<Arguments> AUGMENTED_URLCases() {
@@ -528,7 +529,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("AUGMENTED_URLCases")
     final void stringMatchesAUGMENTED_URL(String s, boolean b) {
-        assertRegex(ProtocolPatterns.AUGMENTED_URL, s, b);
+        assertRegex(PatternGroup.AUGMENTEDURL.getPattern(), s, b);
     }
 
     final Stream<Arguments> STATECases() {
@@ -545,7 +546,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("STATECases")
     final void stringMatchesSTATE(String s, boolean b) {
-        assertRegex(ProtocolPatterns.STATE, s, b);
+        assertRegex(PatternGroup.STATE.getPattern(), s, b);
     }
 
     final Stream<Arguments> MESSAGECases() {
@@ -563,7 +564,7 @@ public class ProtocolPatternsTests {
     @ParameterizedTest
     @MethodSource("MESSAGECases")
     final void stringMatchesMESSAGE(String s, boolean b) {
-        assertRegex(ProtocolPatterns.MESSAGE, s, b);
+        assertRegex(PatternGroup.MESSAGE.getPattern(), s, b);
     }
 
     private void assertRegex(String regex, String sequence, boolean expected) {

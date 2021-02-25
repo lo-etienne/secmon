@@ -1,5 +1,5 @@
 package be.flmr.secmon.probe.service;
 
 public interface ServiceProber {
-    String probeService();
+    String get(Service service);
 }

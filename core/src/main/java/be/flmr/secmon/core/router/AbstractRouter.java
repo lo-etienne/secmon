@@ -13,7 +13,6 @@ import java.util.Map;
 public abstract class AbstractRouter {
     // Injected
     private Map<Method, ProtocolPattern> protocols;
-    private Object sender;
 
     public final void execute(Object sender, IProtocolPacket input) {
         for (Map.Entry<Method, ProtocolPattern> entry : protocols.entrySet()) {
@@ -30,9 +29,5 @@ public abstract class AbstractRouter {
                 }
             }
         }
-    }
-
-    public final Object getSender() {
-        return sender;
     }
 }

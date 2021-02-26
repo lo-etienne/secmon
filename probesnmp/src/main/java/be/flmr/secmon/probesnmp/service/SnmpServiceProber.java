@@ -1,5 +1,6 @@
 package be.flmr.secmon.probesnmp.service;
 
+import be.flmr.secmon.probe.net.IService;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -12,7 +13,6 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
-import be.flmr.secmon.probe.service.Service;
 import be.flmr.secmon.probe.service.ServiceProber;
 
 import org.slf4j.Logger;
@@ -44,12 +44,12 @@ public class SnmpServiceProber implements ServiceProber {
     }
 
     @Override
-    public String get(Service service) {
-        CommunityTarget<Address> target = createDefault(service.getIp(), service.getUser());
+    public String get(IService service) {
+        CommunityTarget<Address> target = createDefault(service.getURL().getHost(), service.getURL().getUserInfo());
 
         try(Snmp snmp = new Snmp(new DefaultUdpTransportMapping())) {
             PDU pdu = new PDU();
-            pdu.add(new VariableBinding(new OID(service.getOid())));
+            pdu.add(new VariableBinding(new OID(service.getURL().getPath())));
 
             snmp.listen();
 

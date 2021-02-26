@@ -5,12 +5,15 @@ import be.flmr.secmon.core.net.IProtocolPacketReceiver;
 import be.flmr.secmon.core.net.IProtocolPacketSender;
 import be.flmr.secmon.core.net.IServer;
 import be.flmr.secmon.core.pattern.IProtocolPacket;
+import be.flmr.secmon.core.pattern.ProtocolPacket;
 import be.flmr.secmon.core.router.AbstractRouter;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class ProbeClient implements IClient, IProtocolPacketSender, IProtocolPacketReceiver {
     private final AbstractRouter router;
@@ -25,13 +28,25 @@ public class ProbeClient implements IClient, IProtocolPacketSender, IProtocolPac
         this.socket = socket;
         this.router = router;
 
-        //out = new PrintWriter(socket.getOutputStream());
-        //in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        try {
+            out = new PrintWriter(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public IProtocolPacket receive() {
-        return null;
+        IProtocolPacket packet;
+        try {
+            String line = in.readLine();
+            packet = ProtocolPacket.from(line);
+            return packet;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -43,6 +58,7 @@ public class ProbeClient implements IClient, IProtocolPacketSender, IProtocolPac
     public void run() {
         while (!server.isShuttingDown()) {
             var packet = receive();
+
             router.execute(this, packet);
         }
     }

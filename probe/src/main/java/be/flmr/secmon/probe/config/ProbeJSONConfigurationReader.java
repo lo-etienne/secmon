@@ -24,6 +24,11 @@ public class ProbeJSONConfigurationReader implements ProbeConfigurationReader {
     }
 
     @Override
+    public String getProtocol() {
+        return config.protocol;
+    }
+
+    @Override
     public String getMulticastAddress() {
         return config.multicastAddress;
     }
@@ -49,6 +54,9 @@ public class ProbeJSONConfigurationReader implements ProbeConfigurationReader {
 
         @SerializedName("version")
         private String version;
+
+        @SerializedName("protocol")
+        private String protocol;
 
         @SerializedName("multicast_address")
         private String multicastAddress;

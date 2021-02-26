@@ -2,8 +2,11 @@ package be.flmr.secmon.probe.net;
 
 import be.flmr.secmon.core.pattern.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static be.flmr.secmon.core.pattern.PatternGroup.*;
 
@@ -40,8 +43,12 @@ public class Service implements IProtocolPacket, IService {
     }
 
     @Override
-    public String getURL() {
-        return getValue(URL);
+    public java.net.URL getURL() {
+        try {
+            return new URL(getValue(URL));
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
@@ -82,5 +89,18 @@ public class Service implements IProtocolPacket, IService {
     @Override
     public String getMessage() {
         return packet.getMessage();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Service service = (Service) o;
+        return Objects.equals(getID(), service.getID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getID());
     }
 }

@@ -1,0 +1,11 @@
+plugins {
+    id 'java'
+}
+
+group 'be.flmr.secmon'
+version '0.1'
+
+dependencies {
+    implementation project(':probe')
+    implementation group: 'org.snmp4j', name: 'snmp4j', version: '3.4.4'
+}

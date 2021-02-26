@@ -1,14 +1,25 @@
 package be.flmr.secmon.core.router;
 
+import be.flmr.secmon.core.pattern.IProtocolPacket;
 import be.flmr.secmon.core.pattern.PatternGroup;
-import be.flmr.secmon.core.pattern.ProtocolPattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import static be.flmr.secmon.core.pattern.ProtocolPattern.ANNOUNCE;
+import static be.flmr.secmon.core.pattern.ProtocolPattern.NOTIFICATION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class RouterTest {
+    @Mock
+    public IProtocolPacket packet;
+
     private static boolean verify;
     private static String parameter;
     private AbstractRouter router;
@@ -22,27 +33,52 @@ public class RouterTest {
 
     @Test
     final void executesMethodWhenRegexMatches() {
-        router.execute("IAMHERE world 142\r\n");
+        when(packet.getType()).thenReturn(ANNOUNCE);
+        when(packet.getValue(PatternGroup.PROTOCOL)).thenReturn("world");
+
+        router.execute(this, packet);
         assertThat(verify, equalTo(true));
     }
 
     @Test
     final void passesGroupedParameterAsAnnotatedParameter() {
-        router.execute("IAMHERE world 123\r\n");
+        when(packet.getType()).thenReturn(ANNOUNCE);
+        when(packet.getValue(PatternGroup.PROTOCOL)).thenReturn("world");
+
+        router.execute(this, packet);
         assertThat(parameter, equalTo("world"));
     }
 
     @Test
-    final void doesNotExecuteMethodWhenRegexDoesntMatch() {
-        router.execute("this does not match");
+    final void doesNotExecuteMethodWhenNoValueIsSpecified() {
+        router.execute(this, packet);
         assertThat(verify, equalTo(false));
     }
 
+    @Test
+    final void throwsExceptionWhenNonNullableParameterIsNotSpecified() {
+        when(packet.getType()).thenReturn(ANNOUNCE);
+
+        assertThrows(NullPointerException.class, () -> router.execute(this, packet));
+    }
+
+    @Test
+    final void throwsExceptionWhenMethodDoesNotContainGroupAnnotation() {
+        when(packet.getType()).thenReturn(NOTIFICATION);
+
+        assertThrows(IllegalArgumentException.class, () -> router.execute(this, packet));
+    }
+
     private static class RouterStub extends AbstractRouter {
-        @Protocol(pattern = ProtocolPattern.ANNOUNCE)
-        public void hello(@Group(group = PatternGroup.PROTOCOL) String world) {
+        @Protocol(pattern = ANNOUNCE)
+        public void hello(Object sender, IProtocolPacket packet) {
             verify = true;
-            parameter = world;
+            parameter = packet.getValue(PatternGroup.PROTOCOL);
+        }
+
+        @Protocol(pattern = NOTIFICATION)
+        public void noGroup(String test) {
+
         }
     }
 }

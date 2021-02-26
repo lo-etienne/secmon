@@ -6,11 +6,11 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Reader;
 
 public class ProbeJSONConfigurationReader implements ProbeConfigurationReader {
-    private JsonConfig config;
+    private ProbeJSONConfig config;
 
     public ProbeJSONConfigurationReader(Reader reader) {
         Gson gson = new Gson();
-        config = gson.fromJson(reader, JsonConfig.class);
+        config = gson.fromJson(reader, ProbeJSONConfig.class);
     }
 
     @Override
@@ -21,6 +21,11 @@ public class ProbeJSONConfigurationReader implements ProbeConfigurationReader {
     @Override
     public String getVersion() {
         return config.version;
+    }
+
+    @Override
+    public String getProtocol() {
+        return config.protocol;
     }
 
     @Override
@@ -38,12 +43,20 @@ public class ProbeJSONConfigurationReader implements ProbeConfigurationReader {
         return config.aesKey;
     }
 
-    private static class JsonConfig {
+    @Override
+    public int getAliveInterval() {
+        return config.aliveInterval;
+    }
+
+    private static class ProbeJSONConfig {
         @SerializedName("name")
         private String name;
 
         @SerializedName("version")
         private String version;
+
+        @SerializedName("protocol")
+        private String protocol;
 
         @SerializedName("multicast_address")
         private String multicastAddress;
@@ -53,5 +66,8 @@ public class ProbeJSONConfigurationReader implements ProbeConfigurationReader {
 
         @SerializedName("aes_key")
         private String aesKey;
+
+        @SerializedName("alive_interval")
+        private int aliveInterval;
     }
 }

@@ -1,4 +1,4 @@
-package be.flmr.secmon.probe.net;
+package be.flmr.secmon.core.net;
 
 import be.flmr.secmon.core.pattern.*;
 
@@ -22,7 +22,7 @@ public class Service implements IProtocolPacket, IService {
             Service service = new Service(packet, augmentedURL);
             services.add(service);
         }
-        return services; // TODO: remplacer par ImmutableList
+        return services;
     }
 
     private Service(IProtocolPacket packet, String augmentedURL) {

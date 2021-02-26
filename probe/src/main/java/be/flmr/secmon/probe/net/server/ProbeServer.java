@@ -6,8 +6,8 @@ import be.flmr.secmon.core.pattern.*;
 import be.flmr.secmon.core.router.AbstractRouter;
 import be.flmr.secmon.core.router.Protocol;
 import be.flmr.secmon.probe.config.ProbeJSONConfigurationReader;
-import be.flmr.secmon.probe.net.IService;
-import be.flmr.secmon.probe.net.Service;
+import be.flmr.secmon.core.net.IService;
+import be.flmr.secmon.core.net.Service;
 import be.flmr.secmon.probe.net.client.ProbeClient;
 
 import java.io.IOException;
@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class ProbeServer extends AbstractRouter implements IServer, Runnable {
     private final ExecutorService executor = Executors.newFixedThreadPool(3);

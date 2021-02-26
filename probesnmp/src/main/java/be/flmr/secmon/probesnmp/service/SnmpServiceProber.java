@@ -1,6 +1,6 @@
 package be.flmr.secmon.probesnmp.service;
 
-import be.flmr.secmon.probe.net.IService;
+import be.flmr.secmon.core.net.IService;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;

@@ -12,7 +12,7 @@ import java.io.StringWriter;
 import java.util.concurrent.Callable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DaemonJSONConfigurationWriterTest {
@@ -28,16 +28,23 @@ public class DaemonJSONConfigurationWriterTest {
     }
 
     @Test
-    final void writesNewProbe() {
-        writer.beginTransaction()
-                .addService("new service")
-                .endTransaction();
+    final void writesNewService() {
+        writer.addService("new service");
 
         assertThat(stringWriter.toString(), containsString("new service"));
     }
 
     @Test
-    final void throwsExceptionOnAddingServiceWithoutTransaction() {
-        assertThrows(IllegalStateException.class, () -> writer.addServices(""));
+    final void writesNewServices() {
+        writer.addServices("A", "B", "C", "D", "E");
+
+        assertThat(stringWriter.toString(), allOf(
+                containsString("A"),
+                containsString("B"),
+                containsString("C"),
+                containsString("D"),
+                containsString("E"),
+                not(containsString("F"))
+        ));
     }
 }

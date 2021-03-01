@@ -10,16 +10,10 @@ import java.util.concurrent.locks.Lock;
 
 public class DaemonJSONConfigurationReader implements IDaemonConfigurationReader {
     private DaemonJSONConfig config;
-    private Lock lock = ReadWriteLockContainer.lock.readLock();
 
     public DaemonJSONConfigurationReader(Reader reader) {
-        lock.lock();
-        try {
-            Gson gson = new Gson();
-            config = gson.fromJson(reader, DaemonJSONConfig.class);
-        } finally {
-            lock.unlock();
-        }
+        Gson gson = new Gson();
+        config = gson.fromJson(reader, DaemonJSONConfig.class);
     }
 
     @Override

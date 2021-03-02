@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated(forRemoval = true)
 public class RouterLoader {
     private static final Logger log = LoggerFactory.getLogger(RouterLoader.class);
     public static <T> T loadRouter(final Class<T> type) {

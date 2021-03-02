@@ -6,18 +6,24 @@ import be.flmr.secmon.core.pattern.*;
 import be.flmr.secmon.core.router.AbstractRouter;
 import be.flmr.secmon.core.router.Protocol;
 import be.flmr.secmon.daemon.config.IDaemonConfigurationReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class NorthPole extends AbstractRouter implements INorthPole {
+    private static final Logger log = LoggerFactory.getLogger(NorthPole.class);
 
     private IProtocolPacketReceiver multicast;
-
     private IDaemonConfigurationReader daemonConfigurationReader;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public NorthPole(IProtocolPacketReceiver multicast, IDaemonConfigurationReader daemonConfigurationReader) {
         super();
@@ -32,7 +38,7 @@ public class NorthPole extends AbstractRouter implements INorthPole {
     @Override
     public void run() {
         IProtocolPacket receivedPacket = multicast.receive();
-        execute(null, receivedPacket);
+        executor.execute(() -> execute(null, receivedPacket));
     }
 
     @Protocol(pattern = ProtocolPattern.ANNOUNCE)

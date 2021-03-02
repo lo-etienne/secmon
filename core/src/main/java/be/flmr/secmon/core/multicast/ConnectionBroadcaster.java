@@ -1,5 +1,10 @@
 package be.flmr.secmon.core.multicast;
 
+import be.flmr.secmon.core.net.IIntervalProtocolPacketSender;
+import be.flmr.secmon.core.net.IProtocolPacketReceiver;
+import be.flmr.secmon.core.net.IProtocolPacketSender;
+import be.flmr.secmon.core.pattern.IProtocolPacket;
+import be.flmr.secmon.core.pattern.ProtocolPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,71 +16,74 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
 
-public class ConnectionBroadcaster implements IBroadcasterReceiver, IBroadcasterSender {
+public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocolPacketSender, IIntervalProtocolPacketSender {
 
 
     private final static Logger log = LoggerFactory.getLogger(ConnectionBroadcaster.class);
 
     private final InetAddress group;
     private final MulticastSocket socket;
-    private final ExecutorService executor;
-
-    public static void main(String[] args) {
-        ConnectionBroadcaster broadcaster = new ConnectionBroadcaster("224.50.50.50", 60150, 2);
-        broadcaster.send("Hello!");
-    }
+    private ScheduledExecutorService executor;
 
     public ConnectionBroadcaster(final String multicastAddress, final int multicastPort) {
         this(multicastAddress, multicastPort, 1);
     }
 
-    public ConnectionBroadcaster(final String multicastAddress, final int multicastPort, final int threadsNumber) {
+    /**
+     * Constructeur de broadcaster multicast avec un paramètre ScheduledExecutorService
+     * @param multicastAddress correspond à l'adresse du multicast
+     * @param multicastPort correspond au port du multicast
+     * @param executor ScheduledExecutorService
+     */
+    public ConnectionBroadcaster(final String multicastAddress, final int multicastPort, final ScheduledExecutorService executor) {
         try {
             group = InetAddress.getByName(multicastAddress);
             socket = new MulticastSocket(multicastPort);
-            executor = (threadsNumber == 1) ? Executors.newSingleThreadExecutor() : Executors.newFixedThreadPool(threadsNumber);
         } catch (IOException ex) {
             throw new RuntimeException("ConnectionBroadcaster : une erreur est survenue pendant la création d'un broadcaster");
         }
     }
 
+
+    /**
+     * Constructeur d'un broadcaster multicast sans paramètre ScheduledExecutorService, ce dernier sera initialisé dans le constructeur
+     * @param multicastAddress correspond à l'addresse du multicast
+     * @param multicastPort correspond au port du multicast
+     * @param threadsNumber correspond au nombre de thread nécessaire, si =1 alors un seul thread sinon une piscine de thread
+     */
+    public ConnectionBroadcaster(final String multicastAddress, final int multicastPort, final int threadsNumber) {
+        try {
+            group = InetAddress.getByName(multicastAddress);
+            socket = new MulticastSocket(multicastPort);
+            executor = (threadsNumber == 1) ? Executors.newSingleThreadScheduledExecutor() : Executors.newScheduledThreadPool(threadsNumber);
+        } catch (IOException ex) {
+            throw new RuntimeException("ConnectionBroadcaster : une erreur est survenue pendant la création d'un broadcaster");
+        }
+    }
+
+    /**
+     * Méthode qui permet de recevoir un ProtocolPacket contenant un message fournit par un DatagramPacket
+     * @return un ProtocolPacket
+     */
     @Override
-    public Future<String> receive() {
-        return executor.submit(() -> {
+    public IProtocolPacket receive() {
             try {
-                log.info("Début de la réception");
                 final byte[] buffer = new byte[256];
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, 60150);
-                log.info("Entrée dans socket.receive");
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                socket.joinGroup(group);
                 socket.receive(packet);
-                log.info("Message reçu");
-                return new String(packet.getData(), StandardCharsets.UTF_8);
+                socket.leaveGroup(group);
+                return ProtocolPacket.from(new String(packet.getData(), StandardCharsets.UTF_8));
             } catch (IOException ioException) {
                 log.warn("MulticastPacket : le message n'a pas été reçu", ioException);
                 throw new RuntimeException("MulticastPacket : le message n'a pas été reçu", ioException);
             }
-        });
     }
 
-    @Override
-    public void send(final String message) {
-        executor.execute(() -> sendMessage(message));
-    }
-
-    @Override
-    public void sendWithInterval(final String message, final long timeOut, final TimeUnit unit) {
-        executor.execute(() -> {
-            try {
-                while (!Thread.interrupted()) {
-                    sendMessage(message);
-                    executor.awaitTermination(timeOut, unit);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
+    /**
+     * Méthode qui permet d'envoyer un message à l'aide d'un DatagramPacket et un MulticastSocket
+     * @param message correspond au message à envoyer
+     */
     private void sendMessage(final String message) {
         try {
             final byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
@@ -86,5 +94,28 @@ public class ConnectionBroadcaster implements IBroadcasterReceiver, IBroadcaster
         } catch (IOException ex) {
             log.error("Erreur Datagram : le message n'a pas été envoyé", ex);
         }
+    }
+
+    /**
+     * Méthode qui permet d'envoyer le message que contient un packet
+     * @param packet objet IProtocolPacket qui contient le message
+     */
+    @Override
+    public void send(IProtocolPacket packet) {
+        sendMessage(packet.buildMessage());
+    }
+
+    /**
+     * Méthode qui permet d'envoyer le message que contient un packet avec une intervalle donnée
+     * @param packet objet IProtocolPacket qui contient le message
+     * @param timeOut temps d'attente exprimé en long
+     * @param unit unité de temps qui sera utilisé pour le délai
+     * @return un ScheduledFuture, nécessaire pour cancel les threads si une probe s'arrête
+     */
+    @Override
+    public ScheduledFuture<?> sendWithInterval(IProtocolPacket packet, long timeOut, TimeUnit unit) {
+        return executor.scheduleWithFixedDelay(() -> {
+            sendMessage(packet.buildMessage());
+        }, 0, timeOut, unit);
     }
 }

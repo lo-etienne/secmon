@@ -6,4 +6,5 @@ public interface ProbeConfigurationReader {
     String getMulticastAddress();
     String getMulticastPort();
     String getAesKey();
+    int getAliveInterval();
 }

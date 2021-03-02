@@ -4,4 +4,7 @@ public interface IProtocolPacket {
     String getValue(IEnumPattern pattern);
     void setValue(IEnumPattern pattern, String value);
     String buildMessage();
+
+    IEnumPattern getType();
+    String getMessage();
 }

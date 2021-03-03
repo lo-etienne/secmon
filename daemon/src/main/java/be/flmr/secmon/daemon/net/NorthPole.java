@@ -5,6 +5,7 @@ import be.flmr.secmon.core.net.IProtocolPacketSender;
 import be.flmr.secmon.core.pattern.*;
 import be.flmr.secmon.core.router.AbstractRouter;
 import be.flmr.secmon.core.router.Protocol;
+import be.flmr.secmon.core.security.AESUtils;
 import be.flmr.secmon.daemon.config.IDaemonConfigurationReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +20,16 @@ import java.util.stream.Collectors;
 
 public class NorthPole extends AbstractRouter implements INorthPole {
     private static final Logger log = LoggerFactory.getLogger(NorthPole.class);
+    private final ServiceStateStack stateStack;
 
     private IProtocolPacketReceiver multicast;
     private IDaemonConfigurationReader daemonConfigurationReader;
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public NorthPole(IProtocolPacketReceiver multicast, IDaemonConfigurationReader daemonConfigurationReader) {
+    public NorthPole(IProtocolPacketReceiver multicast, IDaemonConfigurationReader daemonConfigurationReader, ServiceStateStack stateStack) {
         super();
+        this.stateStack = stateStack;
         this.multicast = multicast;
         this.daemonConfigurationReader = daemonConfigurationReader;
     }
@@ -57,9 +60,8 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         int port = Integer.parseInt(packet.getValue(PatternGroup.PORT));
 
         try (Socket socket = new Socket(host, port);
-             PrintWriter writer = new PrintWriter(socket.getOutputStream())) {
-            writer.print(config.buildMessage());
-            writer.flush();
+             DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+            writeEncryptedPacket(out, config);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,14 +79,12 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         int port = Integer.parseInt(packet.getValue(PatternGroup.PORT));
 
         try(Socket socket = new Socket(host, port);
-            PrintWriter writer = new PrintWriter(socket.getOutputStream());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            DataInputStream in = new DataInputStream(socket.getInputStream())) {
 
             for (String id : ids) {
-                writer.write(newStateReq(id).buildMessage());
-                writer.flush();
-
-                execute(socket, ProtocolPacket.from(reader.readLine() + "\r\n"));
+                writeEncryptedPacket(out, newStateReq(id));
+                execute(socket, readEncryptedPacket(in));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,6 +95,16 @@ public class NorthPole extends AbstractRouter implements INorthPole {
     private void onStateResponse(Object sender, IProtocolPacket packet) {
         // TODO: Interprêter la réponse
         System.out.println(packet);
+    }
+
+    private void writeEncryptedPacket(DataOutputStream out, IProtocolPacket packet) throws IOException {
+        out.write(AESUtils.encrypt(packet.buildMessage(), daemonConfigurationReader.getAesKey()));
+    }
+
+    private IProtocolPacket readEncryptedPacket(DataInputStream in) throws IOException {
+        byte[] buffer = new byte[1024];
+        in.readFully(buffer);
+        return ProtocolPacket.from(AESUtils.decrypt(buffer, daemonConfigurationReader.getAesKey()));
     }
 
     private IProtocolPacket newStateReq(String id) {

@@ -1,13 +1,10 @@
 package be.flmr.secmon.core.router;
 
 import be.flmr.secmon.core.pattern.IProtocolPacket;
-import be.flmr.secmon.core.pattern.PatternUtils;
-import be.flmr.secmon.core.pattern.ProtocolPacket;
 import be.flmr.secmon.core.pattern.ProtocolPattern;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

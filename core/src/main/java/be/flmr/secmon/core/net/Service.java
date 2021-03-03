@@ -1,9 +1,8 @@
 package be.flmr.secmon.core.net;
 
-import be.flmr.secmon.core.pattern.*;
+import be.flmr.secmon.core.pattern.IProtocolPacket;
+import be.flmr.secmon.core.pattern.PatternUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

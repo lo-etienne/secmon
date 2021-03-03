@@ -1,6 +1,9 @@
 package be.flmr.secmon.core.pattern;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Classe "data" contenant les données d'un message reçu ou d'un message à envoyer. Permet de construire un message à

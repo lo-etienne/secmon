@@ -4,6 +4,6 @@
   "multicast_address" : "224.50.50.50",
   "multicast_port" : "60150",
   "aes_key": "aPdSgVkYp3s6v9y$B&E(H+MbQeThWmZq",
-  "alive_interval": 10,
+  "alive_interval": 20,
   "protocol": "https"
 }

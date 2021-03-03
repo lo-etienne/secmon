@@ -40,13 +40,16 @@ public class ProbeServiceCommunicator {
     }
 
     public void addService(IService service) {
-        if (services.containsKey(service)) {
-            updateService(service);
-        } else {
-            log.info("Ajout d'un service ({})", service);
-            var serviceTh = new ServiceThread(service, prober);
-            addServiceThread(serviceTh);
+        for (ServiceThread entry : services.keySet()) {
+            if(entry.getService().equals(service)) {
+                updateService(service);
+                return;
+            }
         }
+
+        log.info("Ajout d'un service ({})", service);
+        var serviceTh = new ServiceThread(service, prober);
+        addServiceThread(serviceTh);
     }
 
     public void updateService(IService service) {

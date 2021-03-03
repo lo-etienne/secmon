@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeUnit;
 
 public class ProbeClient implements IClient, IProtocolPacketSender, IProtocolPacketReceiver {
     private final AbstractRouter router;
@@ -23,7 +24,7 @@ public class ProbeClient implements IClient, IProtocolPacketSender, IProtocolPac
     private PrintWriter out;
     private BufferedReader in;
 
-    public ProbeClient(Socket socket, IServer server, AbstractRouter router) {
+    public ProbeClient(Socket socket, IServer server, AbstractRouter router, int timeout) {
         this.server = server;
         this.socket = socket;
         this.router = router;
@@ -34,6 +35,10 @@ public class ProbeClient implements IClient, IProtocolPacketSender, IProtocolPac
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ProbeClient(Socket socket, IServer server, AbstractRouter router) {
+        this(socket, server, router, 100);
     }
 
     @Override
@@ -51,7 +56,8 @@ public class ProbeClient implements IClient, IProtocolPacketSender, IProtocolPac
 
     @Override
     public void send(IProtocolPacket packet) {
-
+        out.print(packet.buildMessage());
+        out.flush();
     }
 
     @Override

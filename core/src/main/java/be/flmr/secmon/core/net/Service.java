@@ -10,85 +10,58 @@ import java.util.Objects;
 
 import static be.flmr.secmon.core.pattern.PatternGroup.*;
 
-public class Service implements IProtocolPacket, IService {
-    private IProtocolPacket packet;
+public class Service implements IService {
+    private String id;
+    private String url;
+    private String min;
+    private String max;
+    private String frequency;
 
-    public static List<Service> from(IProtocolPacket packet) {
-        List<Service> services = new ArrayList<>();
+    public static List<IService> from(IProtocolPacket packet) {
+        List<IService> services = new ArrayList<>();
 
         List<String> augmentedURLS = PatternUtils.findGroups(packet.getMessage(), AUGMENTEDURL);
 
         for (var augmentedURL : augmentedURLS) {
-            Service service = new Service(packet, augmentedURL);
+            Service service = new Service(augmentedURL);
             services.add(service);
         }
         return services;
     }
 
-    private Service(IProtocolPacket packet, String augmentedURL) {
-        this.packet = packet;
-
+    private Service(String augmentedURL) {
         if (augmentedURL != null) {
-            if (getValue(ID) == null) setValue(ID, PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, ID.name()));
-            if (getValue(URL) == null) setValue(URL, PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, URL.name()));
-            if (getValue(MIN) == null) setValue(MIN, PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, MIN.name()));
-            if (getValue(MAX) == null) setValue(MAX, PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, MAX.name()));
-            if (getValue(FREQUENCY) == null) setValue(FREQUENCY, PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, FREQUENCY.name()));
+            id = PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, ID.name());
+            url = PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, URL.name());
+            min = PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, MIN.name());
+            max = PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, MAX.name());
+            frequency = PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, FREQUENCY.name());
         }
     }
 
     @Override
     public String getID() {
-        return getValue(ID);
+        return id;
     }
 
     @Override
-    public java.net.URL getURL() {
-        try {
-            return new URL(getValue(URL));
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e);
-        }
+    public String getURL() {
+        return url;
     }
 
     @Override
     public int getMin() {
-        return Integer.parseInt(getValue(MIN));
+        return Integer.parseInt(min);
     }
 
     @Override
     public int getMax() {
-        return Integer.parseInt(getValue(MAX));
+        return Integer.parseInt(max);
     }
 
     @Override
     public int getFrequency() {
-        return Integer.parseInt(getValue(FREQUENCY));
-    }
-
-    @Override
-    public String getValue(IEnumPattern pattern) {
-        return packet.getValue(pattern);
-    }
-
-    @Override
-    public void setValue(IEnumPattern pattern, String value) {
-        packet.setValue(pattern, value);
-    }
-
-    @Override
-    public String buildMessage() {
-        return packet.buildMessage();
-    }
-
-    @Override
-    public IEnumPattern getType() {
-        return packet.getType();
-    }
-
-    @Override
-    public String getMessage() {
-        return packet.getMessage();
+        return Integer.parseInt(frequency);
     }
 
     @Override

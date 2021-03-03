@@ -4,7 +4,7 @@ import java.net.URL;
 
 public interface IService {
     String getID();
-    URL getURL();
+    String getURL();
     int getMin();
     int getMax();
     int getFrequency();

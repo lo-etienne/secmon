@@ -1,6 +1,7 @@
 package be.flmr.secmon.probesnmp.service;
 
 import be.flmr.secmon.core.net.IService;
+import be.flmr.secmon.core.pattern.PatternUtils;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -20,8 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class SnmpServiceProber implements ServiceProber {
+import static be.flmr.secmon.core.pattern.PatternGroup.*;
 
+public class SnmpServiceProber implements ServiceProber {
     public static final int DEFAULT_VERSION = SnmpConstants.version2c;
     public static final String DEFAULT_PROTOCOL = "udp";
     public static final int DEFAULT_PORT = 161;
@@ -44,12 +46,12 @@ public class SnmpServiceProber implements ServiceProber {
     }
 
     @Override
-    public String get(IService service) {
-        CommunityTarget<Address> target = createDefault(service.getURL().getHost(), service.getURL().getUserInfo());
+    public int get(IService service) throws IOException {
+        CommunityTarget<Address> target = createDefault(PatternUtils.extractGroup(service.getURL(), URL, HOST.name()), PatternUtils.extractGroup(service.getURL(), URL, USERNAME.name()));
 
         try(Snmp snmp = new Snmp(new DefaultUdpTransportMapping())) {
             PDU pdu = new PDU();
-            pdu.add(new VariableBinding(new OID(service.getURL().getPath())));
+            pdu.add(new VariableBinding(new OID(PatternUtils.extractGroup(service.getURL(), URL, PATH.name()).split("/")[1])));
 
             snmp.listen();
 
@@ -61,22 +63,12 @@ public class SnmpServiceProber implements ServiceProber {
             if(response != null) {
                 // if response == null, il y a eu un timeout
                 VariableBinding vb = response.get(0);
-                return vb.getVariable().toString();
+                var temp = vb.getVariable().toString();
+                log.debug("Current value : {}", temp);
+                return Integer.parseInt(temp);
             }
-        } catch(IOException e) {
-            System.out.println("Erreur lors de l'écoute.");
-            e.printStackTrace();
         }
 
-        return null;
+        throw new IOException("Erreur lors de la lecture");
     }
-
-    /*public static void main(String[] args) {
-        Service service = new Service("192.168.128.38", "public", "1.3.6.1.4.1.2021.11.11.0");
-
-        SnmpServiceProber prober = new SnmpServiceProber();
-        prober.get(service);
-    }*/
-
-
 }

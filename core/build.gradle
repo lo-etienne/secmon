@@ -4,8 +4,3 @@ plugins {
 
 group 'be.flmr.secmon.core'
 version '0.1'
-
-dependencies {
-    implementation("com.google.guava:guava:30.1-jre")
-    implementation 'org.jetbrains:annotations:20.1.0'
-}

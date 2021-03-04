@@ -1,20 +1,16 @@
 package be.flmr.secmon.core.router;
 
 import be.flmr.secmon.core.pattern.IProtocolPacket;
-import be.flmr.secmon.core.pattern.PatternUtils;
-import be.flmr.secmon.core.pattern.ProtocolPacket;
 import be.flmr.secmon.core.pattern.ProtocolPattern;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractRouter {
     // Injected
     private Map<Method, ProtocolPattern> protocols;
-    private Object sender;
 
     public AbstractRouter() {
         var type = getClass();
@@ -44,9 +40,5 @@ public abstract class AbstractRouter {
                 }
             }
         }
-    }
-
-    public final Object getSender() {
-        return sender;
     }
 }

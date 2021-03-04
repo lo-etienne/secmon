@@ -1,5 +1,9 @@
 package be.flmr.secmon.probe.service;
 
+import be.flmr.secmon.core.net.IService;
+
+import java.io.IOException;
+
 public interface ServiceProber {
-    String probeService();
+    int get(IService service) throws IOException;
 }

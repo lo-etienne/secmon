@@ -1,7 +1,8 @@
 package be.flmr.secmon.daemon.config;
 
+import be.flmr.secmon.core.net.IService;
+
 public interface IDaemonConfigurationWriter {
-    // TODO: Changer String en IService
-    void addService(final String service);
-    void addServices(final String... service);
+    void addService(final IService service);
+    void addServices(final IService... service);
 }

@@ -39,7 +39,7 @@ public class DaemonJSONTestConfiguration {
         when(packet.getValue(PatternGroup.HOST)).thenReturn("localhost");
         when(packet.getValue(PatternGroup.PROTOCOL)).thenReturn("https");
         when(packet.getValue(PatternGroup.PORT)).thenReturn("60150");
-        when(packet.getType()).thenReturn(ProtocolPattern.ANNOUNCE);
+        when(packet.getType()).thenReturn(ProtocolPattern.NOTIFICATION);
 
         IProtocolPacketReceiver receiver = mock(IProtocolPacketReceiver.class);
         when(receiver.receive()).thenReturn(packet);

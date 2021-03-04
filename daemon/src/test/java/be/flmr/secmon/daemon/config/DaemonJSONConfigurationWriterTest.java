@@ -1,5 +1,6 @@
 package be.flmr.secmon.daemon.config;
 
+import be.flmr.secmon.core.net.IService;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -14,6 +15,8 @@ import java.util.concurrent.Callable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DaemonJSONConfigurationWriterTest {
     private IDaemonConfigurationWriter writer;
@@ -29,22 +32,28 @@ public class DaemonJSONConfigurationWriterTest {
 
     @Test
     final void writesNewService() {
-        writer.addService("new service");
+        String url = "new!new://service.test/path!42!42!42";
 
-        assertThat(stringWriter.toString(), containsString("new service"));
+        IService service = mock(IService.class);
+        when(service.getAugmentedURL()).thenReturn(url);
+        writer.addService(service);
+
+        assertThat(stringWriter.toString(), containsString(url));
     }
 
     @Test
     final void writesNewServices() {
-        writer.addServices("A", "B", "C", "D", "E");
+        IService service = mock(IService.class);
+        when(service.getAugmentedURL()).thenReturn("new1!new://service.test/path!42!42!42");
+
+        IService service2 = mock(IService.class);
+        when(service2.getAugmentedURL()).thenReturn("new2!new://service.test/path!42!42!42");
+
+        writer.addServices(service, service2);
 
         assertThat(stringWriter.toString(), allOf(
-                containsString("A"),
-                containsString("B"),
-                containsString("C"),
-                containsString("D"),
-                containsString("E"),
-                not(containsString("F"))
+                containsString("new1"),
+                containsString("new2")
         ));
     }
 }

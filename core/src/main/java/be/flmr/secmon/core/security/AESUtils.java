@@ -3,12 +3,17 @@ package be.flmr.secmon.core.security;
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public class AESUtils {
+    private static final boolean ENCRYPTION = false;
+
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final String KEY = "aPdSgVkYp3s6v9y$B&E(H+MbQeThWmZq";
 
@@ -16,6 +21,7 @@ public class AESUtils {
     private static final int GCM_TAG_LENGTH = 16;
 
     public static synchronized byte[] encrypt(String in, String strKey) {
+        if (!ENCRYPTION) return in.getBytes(StandardCharsets.UTF_8);
         try {
             return initCipher(strKey, Cipher.ENCRYPT_MODE).doFinal(in.getBytes(StandardCharsets.UTF_8));
         } catch (IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
@@ -24,6 +30,7 @@ public class AESUtils {
     }
 
     public static synchronized String decrypt(byte[] in, String strKey) {
+        if (!ENCRYPTION) return new String(in, StandardCharsets.UTF_8);
         try {
             return new String(initCipher(strKey, Cipher.DECRYPT_MODE).doFinal(in));
         } catch (IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {

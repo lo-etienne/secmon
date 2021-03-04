@@ -1,10 +1,12 @@
 package be.flmr.secmon.daemon.config;
 
+import be.flmr.secmon.core.net.IService;
+
 import java.util.List;
 
 public interface IDaemonConfigurationReader {
 
-    List<String> getServices();
+    List<IService> getServices();
     String getName();
     String getVersion();
     String getMulticastAddress();

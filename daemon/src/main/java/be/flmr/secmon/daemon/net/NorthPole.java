@@ -1,7 +1,6 @@
 package be.flmr.secmon.daemon.net;
 
-import be.flmr.secmon.core.net.IProtocolPacketReceiver;
-import be.flmr.secmon.core.net.IProtocolPacketSender;
+import be.flmr.secmon.core.net.*;
 import be.flmr.secmon.core.pattern.*;
 import be.flmr.secmon.core.router.AbstractRouter;
 import be.flmr.secmon.core.router.Protocol;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,21 +34,18 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         this.daemonConfigurationReader = daemonConfigurationReader;
     }
 
-    boolean isConnected() {
-        return true;
-    }
-
     @Override
     public void run() {
         IProtocolPacket receivedPacket = multicast.receive();
-        executor.execute(() -> execute(null, receivedPacket));
+        execute(null, receivedPacket);
     }
 
     @Protocol(pattern = ProtocolPattern.ANNOUNCE)
     private void onAnnounce(Object sender, IProtocolPacket packet) {
-        List<String> services = daemonConfigurationReader.getServices();
+        List<IService> services = daemonConfigurationReader.getServices();
         String strServices = services.stream()
-                .filter(service -> service.contains(packet.getValue(PatternGroup.PROTOCOL)))
+                .filter(service -> service.getURL().contains(packet.getValue(PatternGroup.PROTOCOL)))
+                .map(IService::getAugmentedURL)
                 .reduce("", (a, b) -> a + (a.isEmpty() ? "" : " ") + b);
 
         IProtocolPacket config = new ProtocolPacketBuilder()
@@ -71,8 +68,8 @@ public class NorthPole extends AbstractRouter implements INorthPole {
     private void onNotify(Object sender, IProtocolPacket packet) {
         String protocol = packet.getValue(PatternGroup.PROTOCOL);
         List<String> ids = daemonConfigurationReader.getServices()
-                .stream().filter(s -> s.contains(protocol))
-                .map(s -> PatternUtils.extractGroup(s, PatternGroup.AUGMENTEDURL, "ID"))
+                .stream().filter(s -> s.getAugmentedURL().contains(protocol))
+                .map(IService::getID)
                 .collect(Collectors.toList());
 
         String host = packet.getValue(PatternGroup.HOST);
@@ -93,8 +90,11 @@ public class NorthPole extends AbstractRouter implements INorthPole {
 
     @Protocol(pattern = ProtocolPattern.STATE_RESP)
     private void onStateResponse(Object sender, IProtocolPacket packet) {
-        // TODO: Interprêter la réponse
-        System.out.println(packet);
+        List<IService> services = Service.from(packet);
+        services.forEach(service -> {
+            if (!stateStack.hasService(service)) stateStack.registerService(service);
+            stateStack.getStates(service).push(ServiceState.valueOf(packet.getValue(PatternGroup.STATE)));
+        });
     }
 
     private void writeEncryptedPacket(DataOutputStream out, IProtocolPacket packet) throws IOException {
@@ -103,8 +103,16 @@ public class NorthPole extends AbstractRouter implements INorthPole {
 
     private IProtocolPacket readEncryptedPacket(DataInputStream in) throws IOException {
         byte[] buffer = new byte[1024];
-        in.readFully(buffer);
-        return ProtocolPacket.from(AESUtils.decrypt(buffer, daemonConfigurationReader.getAesKey()));
+
+        byte b;
+        int i = 0;
+        do {
+            b = in.readByte();
+            buffer[i] = b;
+            ++i;
+        } while (b != '\n');
+
+        return ProtocolPacket.from(AESUtils.decrypt(buffer, daemonConfigurationReader.getAesKey()).trim() + "\r\n");
     }
 
     private IProtocolPacket newStateReq(String id) {

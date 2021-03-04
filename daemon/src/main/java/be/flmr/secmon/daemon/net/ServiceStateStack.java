@@ -1,5 +1,6 @@
 package be.flmr.secmon.daemon.net;
 
+import be.flmr.secmon.core.net.IService;
 import be.flmr.secmon.core.net.ServiceState;
 import be.flmr.secmon.core.util.Tuple;
 
@@ -24,5 +25,9 @@ public class ServiceStateStack {
 
     public void registerService(Object service) {
         servicesStacks.put(service, new Stack<>());
+    }
+
+    public boolean hasService(IService service) {
+        return servicesStacks.containsKey(service);
     }
 }

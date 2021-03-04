@@ -1,5 +1,6 @@
 package be.flmr.secmon.daemon.config;
 
+import be.flmr.secmon.core.net.IService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -28,21 +29,21 @@ public class DaemonJSONConfigurationWriter implements IDaemonConfigurationWriter
     }
 
     @Override
-    public void addService(String service) {
+    public void addService(IService service) {
         var config = gson.fromJson(reader, DaemonJSONConfig.class);
         appendService(service, config);
         write(config);
     }
 
     @Override
-    public void addServices(String... service) {
+    public void addServices(IService... service) {
         var config = gson.fromJson(reader, DaemonJSONConfig.class);
-        for (String s : service) appendService(s, config);
+        for (IService s : service) appendService(s, config);
         write(config);
     }
 
-    private void appendService(String service, DaemonJSONConfig config) {
-        config.probes.add(service);
+    private void appendService(IService service, DaemonJSONConfig config) {
+        config.probes.add(service.getAugmentedURL());
     }
 
     private void write(DaemonJSONConfig config) {

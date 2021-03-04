@@ -1,4 +1,4 @@
-package be.flmr.secmon.probe.net;
+package be.flmr.secmon.core.net;
 
 public interface IService {
     String getID();

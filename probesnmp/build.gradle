@@ -7,5 +7,6 @@ version '0.1'
 
 dependencies {
     implementation project(':probe')
+    implementation project(':core')
     implementation group: 'org.snmp4j', name: 'snmp4j', version: '3.4.4'
 }

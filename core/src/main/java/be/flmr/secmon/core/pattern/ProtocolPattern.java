@@ -2,10 +2,8 @@ package be.flmr.secmon.core.pattern;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import static be.flmr.secmon.core.pattern.PatternGroup.CRLF;
 import static be.flmr.secmon.core.pattern.PatternGroup.SP;

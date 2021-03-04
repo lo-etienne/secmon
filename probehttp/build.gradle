@@ -4,3 +4,8 @@ plugins {
 
 group 'be.flmr.secmon.probehttp'
 version '0.1'
+
+dependencies {
+    implementation project(":probe")
+    implementation project(":core")
+}

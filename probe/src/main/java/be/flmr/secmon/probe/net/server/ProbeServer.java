@@ -36,6 +36,8 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
     private ServerSocket socket;
     private int aliveInterval;
 
+    private String aesKey;
+
     private static final Logger log = LoggerFactory.getLogger(ProbeServer.class);
 
     public ProbeServer(ProbeJSONConfigurationReader reader, ConnectionBroadcaster multicastSender, ServiceProber prober) {
@@ -45,6 +47,8 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
             e.printStackTrace();
         }
         clients = new ConcurrentHashMap<>();
+
+        this.aesKey = reader.getAesKey();
 
         aliveInterval = reader.getAliveInterval();
         this.communicator = new ProbeServiceCommunicator(prober);
@@ -70,7 +74,7 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
             try {
                 Socket client = socket.accept();
 
-                ProbeClient newClient = new ProbeClient(client, this, this);
+                ProbeClient newClient = new ProbeClient(client, this, this, this.aesKey);
                 var future = executor.submit(newClient);
                 clients.put(newClient, future);
 

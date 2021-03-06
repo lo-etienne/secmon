@@ -1,77 +1,101 @@
 package be.flmr.secmon.client;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
+import be.flmr.secmon.core.net.IProtocolPacketReceiver;
+import be.flmr.secmon.core.net.IProtocolPacketSender;
 import be.flmr.secmon.core.pattern.*;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
+import be.flmr.secmon.core.router.AbstractRouter;
 
-@Command(name = "monitor", mixinStandardHelpOptions = true, version = "monitor 1.0", description = "Console for interation with daemon")
-public class Client implements Callable<Integer>{
-    // TODO : securiser les envoie
+import javax.net.ssl.*;
+import java.io.*;
+import java.security.*;
+import java.security.cert.CertificateException;
 
-    private ProtocolClient protocol;
+public class Client implements IProtocolPacketSender{
+    private PrintStream stream;
+    private PrintWriter writer;
+    private BufferedReader buffered;
+    private ProtocolClient pc;
 
-    @Parameters(index = "0", description = "host")
-    private String host = "localhost";
+    public Client(PrintStream stream, String host, String port){
+        this.stream = stream;
+        this.pc = new ProtocolClient(stream);
+        createSSLSocket(host, port);
+    }
 
-    @Option(names = {"-a", "--add_service_req"}, description = "augmented_url")
-    private String add_service_req = "";
+    private void createSSLSocket(String host, String port) {
+        try {
+            char[] pwd = "group5".toCharArray();
 
-    @Option(names = {"-l", "--list_service_req"}, description = "nothing needed")
-    private String list_service_req = "void";
+            KeyStore ks = KeyStore.getInstance("PKCS12");
+            InputStream is = new FileInputStream("C:\\Users\\Robin\\Desktop\\cours reseaux\\group5.monitor.p12");
+            ks.load(is, pwd);
 
-    @Option(names = {"-s", "--state_service_req"}, description = "ID")
-    private String state_service_req = "";
+            String algo = KeyManagerFactory.getDefaultAlgorithm();
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(algo);
+            kmf.init(ks, pwd);
 
-    @Option(names = {"-p", "--port"}, description = "Port")
-    private String port = "42069";
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(algo);
+            tmf.init(ks);
 
-    public Client(){
-        protocol = new ProtocolClient(System.out);
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+
+            SSLSocketFactory sslSocketFactory = context.getSocketFactory();
+            SSLSocket socket  = (SSLSocket) sslSocketFactory.createSocket(host,Integer.parseInt(port));
+
+            socket.startHandshake();
+
+            this.writer = new PrintWriter(socket.getOutputStream());
+            this.buffered = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            /*SocketFactory basicSocketFactory = SocketFactory.getDefault();
+            Socket s = basicSocketFactory.createSocket(host,Integer.parseInt(port));
+            SSLSocketFactory tlsSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            s = tlsSocketFactory.createSocket(s, host, Integer.parseInt(port), true);
+            return (SSLSocket) s;*/
+        } catch (IOException | KeyStoreException e) {
+            throw new RuntimeException("Connection SSl non reussit",e);
+        } catch (CertificateException | KeyManagementException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+            throw new RuntimeException("Erreur non traiter",e);
+        }
+    }
+
+    public void addSrvReq(String group){
+        IProtocolPacket packet = new ProtocolPacketBuilder()
+                .withPatternType(ProtocolPattern.ADD_SERVICE_REQ)
+                .withGroup(PatternGroup.AUGMENTEDURL,group)
+                .build();
+        send(packet);
+    }
+
+    public void listSrvReq(){
+        IProtocolPacket packet = new ProtocolPacketBuilder()
+                .withPatternType(ProtocolPattern.LIST_SERVICE_REQ)
+                .build();
+        send(packet);
+    }
+
+    public void stateSrvReq(String group){
+        IProtocolPacket packet = new ProtocolPacketBuilder()
+                .withPatternType(ProtocolPattern.STATE_SERVICE_REQ)
+                .withGroup(PatternGroup.ID,group)
+                .build();
+        send(packet);
+    }
+
+    public void receive(){
+        try {
+            String str = buffered.readLine();
+            IProtocolPacket packet = ProtocolPacket.from(str);
+            pc.execute(this,packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public Integer call() throws Exception {
-        Socket socket = new Socket(host,Integer.parseInt(port));
-
-        var writer = new PrintWriter(socket.getOutputStream());
-        var buffered = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-        writer.print(SetPacketClient.setPacket(getMap()).buildMessage());
+    public void send(IProtocolPacket packet) {
+        writer.print(packet.buildMessage());
         writer.flush();
-
-        String str = buffered.readLine();
-        IProtocolPacket packet = ProtocolPacket.from(str + "\r\n");
-        protocol.execute(socket,packet);
-        return 0;
-    }
-
-    /**
-     * Methode qui creer une map<String, String> pour avoir les valeur entree par l'utilisateur
-     * @return Map<String, String>
-     */
-    public Map<String,String> getMap(){
-        Map<String, String> map = new HashMap<>();
-
-        map.put("add_service_req",add_service_req);
-        map.put("list_service_req",list_service_req);
-        map.put("state_service_req",state_service_req);
-
-        return map;
-    }
-
-    public static void main(String[] args){
-        String[] args2 = {"localhost","-a", "LaP0mm3!P0mm3://Sart0:mdp1234@abc.def.123:55555/LesP0mm3s.com!30!250!600"};
-        int exitCode = new CommandLine(new Client()).execute(args2);
-        System.exit(exitCode);
     }
 }

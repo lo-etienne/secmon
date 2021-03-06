@@ -23,8 +23,8 @@ public class ProtocolClient extends AbstractRouter {
 
     @Protocol(pattern = ProtocolPattern.ADD_SERVICE_RESP_OK)
     private void respondServiceOk(Object obj, IProtocolPacket packet){
-
         String str = "+OK";
+
         if(!(packet.getValue(PatternGroup.MESSAGE) == null)){
             str += packet.getValue(PatternGroup.MESSAGE);
         }
@@ -55,10 +55,10 @@ public class ProtocolClient extends AbstractRouter {
 
     @Protocol(pattern = ProtocolPattern.STATE_SERVICE_RESP)
     private void respondState(Object obj, IProtocolPacket packet){
+        String str = "STATE ";
 
-        String str = "STATE";
-        str += packet.getValue(PatternGroup.ID);
-        str += packet.getValue(PatternGroup.URL);
+        str += packet.getValue(PatternGroup.ID) + " ";
+        str += packet.getValue(PatternGroup.URL) + " ";
         str += packet.getValue(PatternGroup.STATE);
 
         stream.println(str);

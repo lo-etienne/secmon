@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'be.flmr.secmon.client'
@@ -13,4 +14,8 @@ dependencies {
 
 compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+application{
+    mainClass = "be.flmr.secmon.client.Client"
 }

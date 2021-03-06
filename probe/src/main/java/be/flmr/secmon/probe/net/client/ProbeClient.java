@@ -6,6 +6,7 @@ import be.flmr.secmon.core.net.IServer;
 import be.flmr.secmon.core.pattern.IProtocolPacket;
 import be.flmr.secmon.core.pattern.ProtocolPacket;
 import be.flmr.secmon.core.router.AbstractRouter;
+import be.flmr.secmon.core.security.Base64AesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +24,17 @@ public class ProbeClient implements IClient, IProtocolPacketSender, AutoCloseabl
     private Socket socket;
     private IServer server;
 
+    private String aesKey;
+
     private PrintWriter out;
     private BufferedReader in;
 
-    public ProbeClient(Socket socket, IServer server, AbstractRouter router) {
+    public ProbeClient(Socket socket, IServer server, AbstractRouter router, String aes) {
         this.server = server;
         this.socket = socket;
         this.router = router;
+
+        this.aesKey = aes;
 
         try {
             out = new PrintWriter(socket.getOutputStream());
@@ -46,7 +51,7 @@ public class ProbeClient implements IClient, IProtocolPacketSender, AutoCloseabl
 
     @Override
     public void send(IProtocolPacket packet) {
-        out.print(packet.buildMessage());
+        out.print(Base64AesUtils.encrypt(packet.buildMessage(), aesKey));
         out.flush();
     }
 

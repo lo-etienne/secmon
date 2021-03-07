@@ -74,6 +74,7 @@ public enum ProtocolPattern implements IEnumPattern {
      * @return le message à envoyer.
      */
     public String buildMessage(List<String> values) {
+        String prefix = this.prefix.replace("\\", "");
         return prefix + values.stream()
                 .filter(Objects::nonNull)
                 .reduce("", (ac, value) -> ac + " " + value) + "\r\n";

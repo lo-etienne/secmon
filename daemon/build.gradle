@@ -4,3 +4,7 @@ plugins {
 
 group 'be.flmr.secmon.daemon'
 version '0.1'
+
+dependencies {
+    implementation(project(":core"))
+}

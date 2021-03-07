@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+dependencies {
+    implementation project(':probe')
+    implementation project(':core')
+}
+
+group 'be.flmr.secmon'
+version '0.1'

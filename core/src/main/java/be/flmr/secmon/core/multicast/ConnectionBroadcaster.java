@@ -5,19 +5,25 @@ import be.flmr.secmon.core.net.IProtocolPacketReceiver;
 import be.flmr.secmon.core.net.IProtocolPacketSender;
 import be.flmr.secmon.core.pattern.IProtocolPacket;
 import be.flmr.secmon.core.pattern.ProtocolPacket;
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+class Test {
+    public static void main(String[] args) {
+        ConnectionBroadcaster connectionBroadcasterSender = new ConnectionBroadcaster("224.50.50.50", 60150);
+        ProtocolPacket packet = ProtocolPacket.from("IAMHERE http5 60150\r\n");
+        connectionBroadcasterSender.send(packet);
+    }
+}
 
 public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocolPacketSender, IIntervalProtocolPacketSender {
 
@@ -27,6 +33,12 @@ public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocol
     private final InetAddress group;
     private final MulticastSocket socket;
     private ScheduledExecutorService executor;
+
+    public static void main(String[] args) {
+        ConnectionBroadcaster connectionBroadcasterReceiver = new ConnectionBroadcaster("224.50.50.50", 60150);
+        IProtocolPacket packet = connectionBroadcasterReceiver.receive();
+        System.out.println(packet);
+    }
 
     public ConnectionBroadcaster(final String multicastAddress, final int multicastPort) {
         this(multicastAddress, multicastPort, 1);
@@ -75,8 +87,9 @@ public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocol
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.joinGroup(group);
                 socket.receive(packet);
+                InetAddress address = packet.getAddress();
                 socket.leaveGroup(group);
-                return ProtocolPacket.from(new String(packet.getData(), StandardCharsets.UTF_8));
+                return ProtocolPacket.from(new String(packet.getData(), StandardCharsets.UTF_8).trim() + "\r\n", address);
             } catch (IOException ioException) {
                 log.warn("MulticastPacket : le message n'a pas été reçu", ioException);
                 throw new RuntimeException("MulticastPacket : le message n'a pas été reçu", ioException);

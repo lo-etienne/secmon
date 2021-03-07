@@ -11,12 +11,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class Base64AesUtils {
+    private static final boolean ENCRYPTION = true;
+
     private static final String ALGORITHM = "AES/GCM/NoPadding";
 
     private static final int GCM_IV_LENGTH = 12;
     private static final int GCM_TAG_LENGTH = 16;
 
     public static synchronized String encrypt(String input, String key) {
+        if (!ENCRYPTION) return input;
         try {
             return Base64.getEncoder().encodeToString(initCipher(key, Cipher.ENCRYPT_MODE).doFinal(input.getBytes(StandardCharsets.UTF_8)));
         } catch (IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
@@ -25,6 +28,7 @@ public class Base64AesUtils {
     }
 
     public static synchronized String decrypt(String encrypted, String key) {
+        if (!ENCRYPTION) return encrypted;
         try {
             return new String(initCipher(key, Cipher.DECRYPT_MODE).doFinal(Base64.getDecoder().decode(encrypted)), StandardCharsets.UTF_8);
         } catch (IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {

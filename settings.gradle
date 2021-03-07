@@ -4,4 +4,5 @@ include 'probehttp'
 include 'daemon'
 include 'probe'
 include 'probesnmp'
+include 'probemc'
 

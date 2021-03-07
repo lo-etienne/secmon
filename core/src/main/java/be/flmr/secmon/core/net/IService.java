@@ -6,4 +6,6 @@ public interface IService {
     int getMin();
     int getMax();
     int getFrequency();
+
+    String getAugmentedURL();
 }

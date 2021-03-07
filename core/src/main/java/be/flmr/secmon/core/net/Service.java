@@ -16,6 +16,8 @@ public class Service implements IService {
     private String max;
     private String frequency;
 
+    private String augmentedURL;
+
     public static List<IService> from(IProtocolPacket packet) {
         List<IService> services = new ArrayList<>();
 
@@ -28,7 +30,8 @@ public class Service implements IService {
         return services;
     }
 
-    private Service(String augmentedURL) {
+    public Service(String augmentedURL) {
+        this.augmentedURL = augmentedURL;
         if (augmentedURL != null) {
             id = PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, ID.name());
             url = PatternUtils.extractGroup(augmentedURL, AUGMENTEDURL, URL.name());
@@ -61,6 +64,11 @@ public class Service implements IService {
     @Override
     public int getFrequency() {
         return Integer.parseInt(frequency);
+    }
+
+    @Override
+    public String getAugmentedURL() {
+        return augmentedURL;
     }
 
     @Override

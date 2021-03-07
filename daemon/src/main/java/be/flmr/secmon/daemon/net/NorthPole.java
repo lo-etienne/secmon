@@ -13,9 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -34,8 +32,11 @@ public class NorthPole extends AbstractRouter implements INorthPole {
 
     private boolean running = true;
 
+    private Socket socket;
+
     public NorthPole(DaemonJSONConfig config, ServiceStateStack stateStack) {
         super();
+        socket = new Socket();
         this.stateStack = stateStack;
         this.multicast = new ConnectionBroadcaster(config.getMulticastAddress(), Integer.parseInt(config.getMulticastPort()), executor);
         this.daemonJSONConfig = config;
@@ -67,10 +68,12 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         String host = ((InetAddress) sender).getHostAddress();
         int port = Integer.parseInt(packet.getValue(PatternGroup.PORT));
 
-        try (Socket socket = new Socket(host, port)) {
+        try {
+            if (!socket.isConnected()) socket.connect(new InetSocketAddress(host, port));
             write(config, socket);
+            socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Erreur lors de l'envoi d'une réponse à ANNOUNCE (CURCONFIG)", e);
         }
     }
 
@@ -85,12 +88,13 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         String host = ((InetAddress) sender).getHostAddress();
         int port = Integer.parseInt(packet.getValue(PatternGroup.PORT));
 
-        try (Socket socket = new Socket(host, port)) {
-
+        try {
+            if (!socket.isConnected()) socket.connect(new InetSocketAddress(host, port));
             for (IService service : services) {
                 write(newStateReq(service.getID()), socket);
                 execute(socket, read(socket));
             }
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

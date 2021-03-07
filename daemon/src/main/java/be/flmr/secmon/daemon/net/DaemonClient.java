@@ -36,7 +36,8 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.abstractRouter = abstractRouter;
         } catch (IOException ioException) {
-            ioException.printStackTrace();
+            LOG.error("Problème lors de la création du client Daemon");
+            throw new RuntimeException(ioException);
         }
     }
 

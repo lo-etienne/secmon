@@ -36,23 +36,11 @@ public class SocketFactory {
 
             SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
 
-            return (SSLServerSocket) sslServerSocketFactory.createServerSocket(Integer.parseInt(config.getClientPort()));
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableKeyException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
+            return sslServerSocketFactory.createServerSocket(Integer.parseInt(config.getClientPort()));
+        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyManagementException e) {
+            LOG.error("Erreur lors du chargement du certificat");
+            throw new RuntimeException();
         }
-        return null;
     }
 
     public static ServerSocket unsecuredSocket(final DaemonJSONConfig config) {
@@ -60,8 +48,8 @@ public class SocketFactory {
             return new ServerSocket(Integer.parseInt(config.getClientPort()));
         } catch (IOException ioException) {
             LOG.error("Problème pendant la création du socket", ioException);
+            throw new RuntimeException();
         }
-        return null;
     }
 
     public static ServerSocket createSocketByConfig(final DaemonJSONConfig config) {

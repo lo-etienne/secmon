@@ -76,6 +76,7 @@ public class ProbeClient implements IClient, IProtocolPacketSender, AutoCloseabl
 
     @Override
     public void close() throws IOException {
+        log.info("Déconnexion du client - {}", socket.getInetAddress());
         this.socket.close();
     }
 }

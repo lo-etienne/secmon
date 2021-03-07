@@ -78,7 +78,7 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
                 var future = executor.submit(newClient);
                 clients.put(newClient, future);
 
-                log.debug("Nouveau client ajouté");
+                log.debug("Client connecté - {}", client.getInetAddress());
             } catch(IOException e) {
                 e.printStackTrace();
             }

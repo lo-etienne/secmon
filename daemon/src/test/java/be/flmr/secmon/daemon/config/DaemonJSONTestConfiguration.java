@@ -6,8 +6,10 @@ import be.flmr.secmon.core.pattern.PatternGroup;
 import be.flmr.secmon.core.pattern.ProtocolPattern;
 import be.flmr.secmon.daemon.net.NorthPole;
 import be.flmr.secmon.daemon.net.ServiceStateStack;
+import be.flmr.secmon.daemon.net.SocketFactory;
+import be.flmr.secmon.daemon.net.SouthPole;
 
-import java.io.StringReader;
+import java.io.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 

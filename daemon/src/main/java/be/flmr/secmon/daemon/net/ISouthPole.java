@@ -7,7 +7,4 @@ import java.util.Set;
 
 public interface ISouthPole extends Runnable {
 
-    void addClient(final Socket daemonClient);
-    Set<IClient> getClients();
-
 }

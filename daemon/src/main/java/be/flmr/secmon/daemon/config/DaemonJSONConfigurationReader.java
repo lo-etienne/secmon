@@ -3,56 +3,28 @@ package be.flmr.secmon.daemon.config;
 import be.flmr.secmon.core.net.IService;
 import be.flmr.secmon.core.net.Service;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.Reader;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class DaemonJSONConfigurationReader implements IDaemonConfigurationReader {
-    private DaemonJSONConfig config;
+    private Reader reader;
+    private Gson gson;
 
-    public DaemonJSONConfigurationReader(Reader reader) {
-        Gson gson = new Gson();
-        config = gson.fromJson(reader, DaemonJSONConfig.class);
+    public DaemonJSONConfigurationReader(final Reader reader) {
+        this.reader = reader;
+        this.gson = new GsonBuilder().registerTypeHierarchyAdapter(IService.class, new ServiceJSONParser()).create();
     }
 
     @Override
-    public List<IService> getServices() {
-        return config.probes.stream().map(Service::new).collect(Collectors.toList());
+    public DaemonJSONConfig read() {
+        return gson.fromJson(reader, DaemonJSONConfig.class);
     }
 
     @Override
-    public String getName() {
-        return config.name;
-    }
-
-    @Override
-    public String getVersion() {
-        return config.version;
-    }
-
-    @Override
-    public String getMulticastAddress() {
-        return config.multicastAddress;
-    }
-
-    @Override
-    public String getMulticastPort() {
-        return config.multicastPort;
-    }
-
-    @Override
-    public String getClientPort() {
-        return config.clientPort;
-    }
-
-    @Override
-    public String getAesKey() {
-        return config.aesKey;
-    }
-
-    @Override
-    public boolean isTls() {
-        return config.tls;
+    public void close() throws Exception {
+        this.reader.close();
     }
 }

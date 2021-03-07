@@ -1,52 +1,39 @@
 package be.flmr.secmon.daemon.config;
 
 import be.flmr.secmon.core.net.IService;
+import be.flmr.secmon.core.net.Service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
 public class DaemonJSONConfigurationWriter implements IDaemonConfigurationWriter {
-    private Reader reader;
+
+    private static final Logger LOG = LoggerFactory.getLogger(DaemonJSONConfigurationWriter.class);
     private Writer writer;
 
     private Gson gson;
 
-    public static DaemonJSONConfigurationWriter fromFile(File file) {
-        try {
-            return new DaemonJSONConfigurationWriter(new FileReader(file), new FileWriter(file));
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Le fichier n'as pas été trouvé ou il y a eu un problème avec ce dernier.", e);
-        }
-    }
-
-    public DaemonJSONConfigurationWriter(Reader reader, Writer writer) {
-        this.gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+    public DaemonJSONConfigurationWriter(final Writer writer) {
         this.writer = writer;
-        this.reader = reader;
+        this.gson = new GsonBuilder().registerTypeAdapter(Service.class, new ServiceJSONParser()).create();
     }
 
     @Override
-    public void addService(IService service) {
-        var config = gson.fromJson(reader, DaemonJSONConfig.class);
-        appendService(service, config);
-        write(config);
+    public void write(final DaemonJSONConfig config) {
+        try {
+            gson.toJson(config, writer);
+        } catch (JsonIOException e) {
+            LOG.warn("Il y a eu une erreur au niveau de la persistance de la configuration du daemon", e);
+        }
+
     }
 
     @Override
-    public void addServices(IService... service) {
-        var config = gson.fromJson(reader, DaemonJSONConfig.class);
-        for (IService s : service) appendService(s, config);
-        write(config);
-    }
-
-    private void appendService(IService service, DaemonJSONConfig config) {
-        config.probes.add(service.getAugmentedURL());
-    }
-
-    private void write(DaemonJSONConfig config) {
-        gson.toJson(config, writer);
+    public void close() throws Exception {
+        this.writer.close();
     }
 }

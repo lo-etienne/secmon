@@ -4,16 +4,9 @@ import be.flmr.secmon.core.net.IService;
 
 import java.util.List;
 
-public interface IDaemonConfigurationReader {
+public interface IDaemonConfigurationReader extends AutoCloseable {
 
-    List<IService> getServices();
-    String getName();
-    String getVersion();
-    String getMulticastAddress();
-    String getMulticastPort();
-    String getClientPort();
-    String getAesKey();
-    boolean isTls();
+    DaemonJSONConfig read();
 
 
 }

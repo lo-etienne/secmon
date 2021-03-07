@@ -13,6 +13,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,7 +43,7 @@ public class NorthPole extends AbstractRouter implements INorthPole {
 
     @Protocol(pattern = ProtocolPattern.ANNOUNCE)
     private void onAnnounce(Object sender, IProtocolPacket packet) {
-        List<IService> services = daemonConfigurationReader.getServices();
+        List<IService> services = null;
         String strServices = services.stream()
                 .filter(service -> service.getURL().contains(packet.getValue(PatternGroup.PROTOCOL)))
                 .map(IService::getAugmentedURL)
@@ -67,10 +68,14 @@ public class NorthPole extends AbstractRouter implements INorthPole {
     @Protocol(pattern = ProtocolPattern.NOTIFICATION)
     private void onNotify(Object sender, IProtocolPacket packet) {
         String protocol = packet.getValue(PatternGroup.PROTOCOL);
-        List<String> ids = daemonConfigurationReader.getServices()
+       List<String> ids = new ArrayList<>();
+
+               /*daemonConfigurationReader.getServices()
                 .stream().filter(s -> s.getAugmentedURL().contains(protocol))
                 .map(IService::getID)
                 .collect(Collectors.toList());
+
+                */
 
         String host = packet.getValue(PatternGroup.HOST);
         int port = Integer.parseInt(packet.getValue(PatternGroup.PORT));
@@ -93,12 +98,12 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         List<IService> services = Service.from(packet);
         services.forEach(service -> {
             if (!stateStack.hasService(service)) stateStack.registerService(service);
-            stateStack.getStates(service).push(ServiceState.valueOf(packet.getValue(PatternGroup.STATE)));
+            stateStack.pushState(service, ServiceState.valueOf(packet.getValue(PatternGroup.STATE)));
         });
     }
 
     private void writeEncryptedPacket(DataOutputStream out, IProtocolPacket packet) throws IOException {
-        out.write(AESUtils.encrypt(packet.buildMessage(), daemonConfigurationReader.getAesKey()));
+        out.write(AESUtils.encrypt(packet.buildMessage(), "daemonConfigurationReader.getAesKey()"));
     }
 
     private IProtocolPacket readEncryptedPacket(DataInputStream in) throws IOException {
@@ -112,7 +117,7 @@ public class NorthPole extends AbstractRouter implements INorthPole {
             ++i;
         } while (b != '\n');
 
-        return ProtocolPacket.from(AESUtils.decrypt(buffer, daemonConfigurationReader.getAesKey()).trim() + "\r\n");
+        return ProtocolPacket.from(AESUtils.decrypt(buffer, "daemonConfigurationReader.getAesKey()).trim()" + "\r\n"));
     }
 
     private IProtocolPacket newStateReq(String id) {

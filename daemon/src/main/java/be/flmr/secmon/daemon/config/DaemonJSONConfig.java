@@ -1,33 +1,40 @@
 package be.flmr.secmon.daemon.config;
 
+import be.flmr.secmon.core.net.IService;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-class DaemonJSONConfig {
+public class DaemonJSONConfig {
     @SerializedName("name")
-    String name;
+    private String name;
 
     @SerializedName("version")
-    String version;
+    private String version;
 
     @SerializedName("multicast_address")
-    String multicastAddress;
+    private String multicastAddress;
 
     @SerializedName("multicast_port")
-    String multicastPort;
+    private String multicastPort;
 
     @SerializedName("client_port")
-    String clientPort;
+    private String clientPort;
 
     @SerializedName("tls")
-    boolean tls;
+    private boolean tls;
 
     @SerializedName("aes_key")
-    String aesKey;
+    private String aesKey;
+
+    @SerializedName("certificate_path")
+    private String certificatePath;
+
+    @SerializedName("certificate_password")
+    private String certificatePassword;
 
     @SerializedName("probes")
-    List<String> probes;
+    private List<IService> services;
 
     @Override
     public String toString() {
@@ -39,7 +46,59 @@ class DaemonJSONConfig {
                 ", clientPort='" + clientPort + '\'' +
                 ", tls=" + tls +
                 ", aesKey='" + aesKey + '\'' +
-                ", probes=" + probes +
+                ", probes=" + services +
                 '}';
+    }
+
+    public List<IService> getServices() {
+        return services;
+    }
+
+    public String getAesKey() {
+        return aesKey;
+    }
+
+    public String getCertificatePath() {
+        return certificatePath;
+    }
+
+    public String getCertificatePassword() {
+        return certificatePassword;
+    }
+
+    public String getClientPort() {
+        return clientPort;
+    }
+
+    public String getMulticastAddress() {
+        return multicastAddress;
+    }
+
+    public String getMulticastPort() {
+        return multicastPort;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void addService(final IService service) {
+        services.add(service);
+    }
+
+    public boolean hasService(final IService service) {
+        return services.contains(service);
+    }
+
+    public void removeService(final IService service) {
+         services.remove(service);
+    }
+
+    public boolean isTls() {
+        return tls;
     }
 }

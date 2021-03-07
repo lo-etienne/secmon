@@ -27,7 +27,7 @@ public class ServiceStateStack {
         servicesStacks.put(service, new Stack<>());
     }
 
-    public boolean hasService(IService service) {
+    public boolean hasService(final IService service) {
         return servicesStacks.containsKey(service);
     }
 }

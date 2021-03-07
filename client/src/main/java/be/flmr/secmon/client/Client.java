@@ -7,14 +7,18 @@ import be.flmr.secmon.core.router.AbstractRouter;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.net.Socket;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 public class Client implements IProtocolPacketSender{
     private PrintStream stream;
     private PrintWriter writer;
     private BufferedReader buffered;
     private ProtocolClient pc;
+    private SSLSocket socket;
 
     public Client(PrintStream stream, String host, String port){
         this.stream = stream;
@@ -26,37 +30,34 @@ public class Client implements IProtocolPacketSender{
         try {
             char[] pwd = "group5".toCharArray();
 
-            KeyStore ks = KeyStore.getInstance("PKCS12");
-            InputStream is = new FileInputStream("C:\\Users\\Robin\\Desktop\\cours reseaux\\group5.monitor.p12");
-            ks.load(is, pwd);
+            InputStream is = new FileInputStream("C:\\Users\\Robin\\Desktop\\cours reseaux\\GodSwilaTrustMeIntermediateCA.crt");
+            InputStream ist = new FileInputStream("C:\\Users\\Robin\\Desktop\\cours reseaux\\GodSwilaTrustMeRootCA.crt");
 
-            String algo = KeyManagerFactory.getDefaultAlgorithm();
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(algo);
-            kmf.init(ks, pwd);
+            X509Certificate ca = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new BufferedInputStream(is));
+            X509Certificate ce = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new BufferedInputStream(ist));
 
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(algo);
-            tmf.init(ks);
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(null,null);
+            ks.setCertificateEntry("1", ca);
+            ks.setCertificateEntry("2", ce);
+
+            TrustManagerFactory trust = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trust.init(ks);
 
             SSLContext context = SSLContext.getInstance("TLS");
-            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+            context.init(null,trust.getTrustManagers(),new SecureRandom());
 
-            SSLSocketFactory sslSocketFactory = context.getSocketFactory();
-            SSLSocket socket  = (SSLSocket) sslSocketFactory.createSocket(host,Integer.parseInt(port));
+            SSLSocketFactory factory = context.getSocketFactory();
+            socket = (SSLSocket) factory.createSocket(host, Integer.parseInt(port));
+            writer = new PrintWriter(socket.getOutputStream());
+            buffered = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            socket.startHandshake();
-
-            this.writer = new PrintWriter(socket.getOutputStream());
-            this.buffered = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            /*SocketFactory basicSocketFactory = SocketFactory.getDefault();
-            Socket s = basicSocketFactory.createSocket(host,Integer.parseInt(port));
-            SSLSocketFactory tlsSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            s = tlsSocketFactory.createSocket(s, host, Integer.parseInt(port), true);
-            return (SSLSocket) s;*/
         } catch (IOException | KeyStoreException e) {
             throw new RuntimeException("Connection SSl non reussit",e);
-        } catch (CertificateException | KeyManagementException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+        } catch (CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Erreur non traiter",e);
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
         }
     }
 
@@ -88,7 +89,7 @@ public class Client implements IProtocolPacketSender{
 
     private void receive(){
         try {
-            String str = buffered.readLine();
+            String str = buffered.readLine() + "\r\n";
             IProtocolPacket packet = ProtocolPacket.from(str);
             pc.execute(this,packet);
         } catch (IOException e) {

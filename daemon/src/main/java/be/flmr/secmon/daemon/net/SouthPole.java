@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class SouthPole implements ISouthPole {
+public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseable, IServer {
 
     private static final Logger log = LoggerFactory.getLogger(SouthPole.class);
 

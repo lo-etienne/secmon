@@ -6,25 +6,30 @@ import be.flmr.secmon.core.util.Tuple;
 
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceStateStack {
-    private Map<Object, Stack<ServiceState>> servicesStacks; // TODO: Remplacer ? par IService
+    private Map<IService, Stack<ServiceState>> servicesStacks;
 
-    public Stack<ServiceState> getStates(Object service) {
-        return servicesStacks.get(service);
+    public ServiceStateStack() {
+        servicesStacks = new ConcurrentHashMap<>();
     }
 
-    public ServiceState getLastState(Object service) {
+    public ServiceState getLastState(final IService service) {
         var stack = servicesStacks.get(service);
         return stack.peek();
     }
 
-    public void pushState(Object service, ServiceState state) {
+    public void pushState(final IService service, final ServiceState state) {
         servicesStacks.get(service).push(state);
     }
 
-    public void registerService(Object service) {
-        servicesStacks.put(service, new Stack<>());
+    public void registerService(final IService service) {
+        if(!hasService(service)) {
+            Stack<ServiceState> states = new Stack<>();
+            states.add(ServiceState.UNLOADED);
+            servicesStacks.put(service, states);
+        }
     }
 
     public boolean hasService(final IService service) {

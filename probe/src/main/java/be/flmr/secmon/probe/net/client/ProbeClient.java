@@ -47,12 +47,13 @@ public class ProbeClient implements IClient, IProtocolPacketSender, AutoCloseabl
 
     private IProtocolPacket receive() throws IOException {
         String line = in.readLine();
+        log.debug("Réception du message {}", line);
         return ProtocolPacket.from(Base64AesUtils.decrypt(line, aesKey));
     }
 
     @Override
     public void send(IProtocolPacket packet) {
-        out.print(Base64AesUtils.encrypt(packet.buildMessage(), aesKey));
+        out.print(Base64AesUtils.encrypt(packet.buildMessage(), aesKey) + "\r\n");
         out.flush();
     }
 
@@ -76,6 +77,9 @@ public class ProbeClient implements IClient, IProtocolPacketSender, AutoCloseabl
 
     @Override
     public void close() throws IOException {
-        this.socket.close();
+        if (!socket.isClosed()) {
+            log.info("Déconnexion du client - {}", socket.getInetAddress());
+            this.socket.close();
+        }
     }
 }

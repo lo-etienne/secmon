@@ -61,3 +61,21 @@ public class DaemonApp {
     }
 
 }
+
+class NorthTest {
+    public static void main(String[] args) {
+        final File file = new File(Objects.requireNonNull(DaemonApp.class.getClassLoader().getResource("monitor.json")).getFile());
+        DaemonJSONConfig daemonJSONConfig;
+
+        try (DaemonJSONConfigurationReader daemonJSONConfigurationReader = new DaemonJSONConfigurationReader(new FileReader(file))) {
+            daemonJSONConfig = daemonJSONConfigurationReader.read();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        ServiceStateStack serviceStateStack = new ServiceStateStack();
+        NorthPole northPole = new NorthPole(daemonJSONConfig, serviceStateStack);
+
+        northPole.run();
+    }
+}

@@ -20,12 +20,12 @@ import java.util.concurrent.TimeUnit;
 class Test {
     public static void main(String[] args) {
         ConnectionBroadcaster connectionBroadcasterSender = new ConnectionBroadcaster("224.50.50.50", 60150);
-        ProtocolPacket packet = ProtocolPacket.from("IAMHERE http5 60150\r\n");
+        ProtocolPacket packet = ProtocolPacket.from("NOTIFY https 60150\r\n");
         connectionBroadcasterSender.send(packet);
     }
 }
 
-public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocolPacketSender, IIntervalProtocolPacketSender {
+public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocolPacketSender, IIntervalProtocolPacketSender, AutoCloseable {
 
 
     private final static Logger log = LoggerFactory.getLogger(ConnectionBroadcaster.class);
@@ -133,5 +133,10 @@ public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocol
         return executor.scheduleWithFixedDelay(() -> {
             sendMessage(packet.buildMessage());
         }, 0, timeOut, unit);
+    }
+
+    @Override
+    public void close() {
+        executor.shutdown();
     }
 }

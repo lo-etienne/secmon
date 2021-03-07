@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'be.flmr.secmon.client'
+version '0.1'
+
+dependencies {
+    implementation(project(":core"))
+    implementation 'info.picocli:picocli:4.6.1'
+    annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
+}
+
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+application{
+    mainClass = "be.flmr.secmon.client.Client"
+}

@@ -89,7 +89,7 @@ public class Client implements IProtocolPacketSender{
 
     private void receive(){
         try {
-            String str = buffered.readLine();
+            String str = buffered.readLine() + "\r\n";
             IProtocolPacket packet = ProtocolPacket.from(str);
             pc.execute(this,packet);
         } catch (IOException e) {

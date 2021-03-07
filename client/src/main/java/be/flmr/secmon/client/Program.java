@@ -23,10 +23,10 @@ public class Program implements Callable<Integer>{
     @Parameters(index = "0", description = "host")
     private String host = "localhost";
 
-    @Parameters(index= "1" ,description = "add-service | list-service | state-service")
+    @Parameters(index= "1", description = "add-service | list-service | state-service")
     private String typeService = "";
 
-    @Parameters(index= "2")
+    @Parameters(index= "2", defaultValue = "")
     private String parameterService = "";
 
     @Option(names = {"-p", "--port"}, description = "Port")
@@ -59,7 +59,6 @@ public class Program implements Callable<Integer>{
     }
 
     public static void main(String[] args){
-        //String[] args2 = {"localhost","-a", "LaP0mm3!P0mm3://Sart0:mdp1234@abc.def.123:55555/LesP0mm3s.com!30!250!600"};
         int exitCode = new CommandLine(new Program()).execute(args);
         System.exit(exitCode);
     }

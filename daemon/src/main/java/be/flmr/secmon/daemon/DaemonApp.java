@@ -1,6 +1,8 @@
 package be.flmr.secmon.daemon;
 
 import be.flmr.secmon.core.multicast.ConnectionBroadcaster;
+import be.flmr.secmon.daemon.config.DaemonJSONConfig;
+import be.flmr.secmon.daemon.config.DaemonJSONConfigurationReader;
 import be.flmr.secmon.daemon.net.NorthPole;
 import be.flmr.secmon.daemon.net.ServiceStateStack;
 import be.flmr.secmon.daemon.net.SocketFactory;
@@ -10,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.StringWriter;
 import java.util.Objects;
 import java.util.Scanner;
@@ -24,11 +27,21 @@ public class DaemonApp {
     public static void main(String[] args) {
         // LIRE LE CONFIG POUR LE NORTHPOLE
         final File file = new File(Objects.requireNonNull(DaemonApp.class.getClassLoader().getResource("monitor.json")).getFile());
-        ServiceStateStack serviceStateStack = new ServiceStateStack();
-        SouthPole southPole = new SouthPole(file, serviceStateStack, SocketFactory::createSocketByConfig);
-        // NorthPole northPole = new NorthPole(new ConnectionBroadcaster());
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        DaemonJSONConfig daemonJSONConfig;
 
+        try (DaemonJSONConfigurationReader daemonJSONConfigurationReader = new DaemonJSONConfigurationReader(new FileReader(file))) {
+            daemonJSONConfig = daemonJSONConfigurationReader.read();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        ServiceStateStack serviceStateStack = new ServiceStateStack();
+        SouthPole southPole = new SouthPole(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
+        NorthPole northPole = new NorthPole(daemonJSONConfig, serviceStateStack);
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        executor.execute(northPole);
         executor.execute(southPole);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

@@ -24,7 +24,6 @@ public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseab
     private static final Logger log = LoggerFactory.getLogger(SouthPole.class);
 
     private DaemonJSONConfig config;
-    private IDaemonConfigurationWriter daemonConfigurationWriter;
     private ServiceStateStack stateStack;
     private ServerSocket serverSocket;
     private ExecutorService executorService;
@@ -32,11 +31,11 @@ public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseab
 
     private Map<DaemonClient, Future<?>> clients = new HashMap<>();
 
-    public SouthPole(final File config,
+    public SouthPole(final DaemonJSONConfig config,
                      final ServiceStateStack stateStack,
                      final Function<DaemonJSONConfig, ? extends ServerSocket> serverSocketSupplier) {
         super();
-        initDaemonConfiguration(config);
+        this.config = config;
         this.stateStack = stateStack;
         for (var service : this.config.getServices()) {
             stateStack.registerService(service);
@@ -45,26 +44,15 @@ public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseab
         executorService = Executors.newFixedThreadPool(10);
     }
 
-    private void initDaemonConfiguration(File config) {
-        try (var daemonJSONConfigurationReader = new DaemonJSONConfigurationReader(new FileReader(config)) ){
-            this.config = daemonJSONConfigurationReader.read();
-            this.daemonConfigurationWriter = new DaemonJSONConfigurationWriter(new FileWriter(config));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Le fichier spécifié est introuvable", e);
-        }
-    }
-
     @Override
     public void run() {
+        log.info("Southpole lancé");
         executorService.execute(this::listenForConnections);
     }
 
     @Override
     public void close() {
         try {
-            log.info("Sauvegarde des données");
-            daemonConfigurationWriter.write(this.config);
-            daemonConfigurationWriter.close();
             log.info("Déconnexion des clients");
             clients.keySet().forEach(DaemonClient::close);
             log.info("Fermeture des threads");
@@ -96,7 +84,6 @@ public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseab
             }
             config.addService(service);
             stateStack.registerService(service);
-            daemonConfigurationWriter.write(config);
             IProtocolPacket packetRespond = createAddRespond(ProtocolPattern.ADD_SERVICE_RESP_OK, "Ajout effectué");
             packetSender.send(packetRespond);
 

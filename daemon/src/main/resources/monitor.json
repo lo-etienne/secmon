@@ -4,7 +4,7 @@
   "multicast_address" : "224.50.50.50",
   "multicast_port" : "60150",
   "client_port" : "42069",
-  "tls": "false",
+  "tls": "true",
   "aes_key": "aPdSgVkYp3s6v9y$B&E(H+MbQeThWmZq",
   "certificate_password": "group5",
   "certificate_path": "C:\\Users\\Etien\\Documents\\reseau\\projet\\secmon\\daemon\\src\\main\\resources\\group5.monitor.p12",

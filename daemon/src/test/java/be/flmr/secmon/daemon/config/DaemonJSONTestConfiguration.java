@@ -8,6 +8,7 @@ import be.flmr.secmon.daemon.net.NorthPole;
 import be.flmr.secmon.daemon.net.ServiceStateStack;
 
 import java.io.StringReader;
+import java.net.InetAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -32,7 +33,7 @@ public class DaemonJSONTestConfiguration {
             "    ]\n" +
             "}\n";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
         IProtocolPacket packet = mock(IProtocolPacket.class);
@@ -40,6 +41,7 @@ public class DaemonJSONTestConfiguration {
         when(packet.getValue(PatternGroup.PROTOCOL)).thenReturn("https");
         when(packet.getValue(PatternGroup.PORT)).thenReturn("60150");
         when(packet.getType()).thenReturn(ProtocolPattern.NOTIFICATION);
+        when(packet.getSourceAddress()).thenReturn(InetAddress.getLocalHost());
 
         IProtocolPacketReceiver receiver = mock(IProtocolPacketReceiver.class);
         when(receiver.receive()).thenReturn(packet);

@@ -1,5 +1,6 @@
 package be.flmr.secmon.core.pattern;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,8 @@ public class ProtocolPacket implements IProtocolPacket {
     private ProtocolPattern protocol;
     private String message;
 
+    private InetAddress sourceAddress;
+
     public ProtocolPacket() {}
 
     /**
@@ -22,8 +25,9 @@ public class ProtocolPacket implements IProtocolPacket {
      * @param message le message (i.e. {@code IAMHERE snmp 161})
      * @return l'instance de protocol pattern avec les valeurs spécifiées.
      */
-    public static ProtocolPacket from(String message) {
+    public static ProtocolPacket from(String message, InetAddress address) {
         ProtocolPacket packet = new ProtocolPacket();
+        packet.sourceAddress = address;
         packet.message = message;
         packet.values = new HashMap<>();
         packet.protocol = ProtocolPattern.getProtocol(message);
@@ -33,6 +37,10 @@ public class ProtocolPacket implements IProtocolPacket {
             packet.values.put(group, extractedValue);
         }
         return packet;
+    }
+
+    public static ProtocolPacket from(String message) {
+        return from(message, null);
     }
 
     /**
@@ -73,6 +81,11 @@ public class ProtocolPacket implements IProtocolPacket {
     @Override
     public IEnumPattern getType() {
         return protocol;
+    }
+
+    @Override
+    public InetAddress getSourceAddress() {
+        return sourceAddress;
     }
 
     @Override

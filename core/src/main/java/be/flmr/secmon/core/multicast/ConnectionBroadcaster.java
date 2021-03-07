@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -75,8 +73,9 @@ public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocol
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.joinGroup(group);
                 socket.receive(packet);
+                InetSocketAddress address = (InetSocketAddress) socket.getRemoteSocketAddress();
                 socket.leaveGroup(group);
-                return ProtocolPacket.from(new String(packet.getData(), StandardCharsets.UTF_8));
+                return ProtocolPacket.from(new String(packet.getData(), StandardCharsets.UTF_8), address.getAddress());
             } catch (IOException ioException) {
                 log.warn("MulticastPacket : le message n'a pas été reçu", ioException);
                 throw new RuntimeException("MulticastPacket : le message n'a pas été reçu", ioException);

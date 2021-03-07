@@ -2,7 +2,6 @@ package be.flmr.secmon.daemon.net;
 
 import be.flmr.secmon.core.net.IService;
 import be.flmr.secmon.core.net.ServiceState;
-import be.flmr.secmon.core.util.Tuple;
 
 import java.util.Map;
 import java.util.Stack;

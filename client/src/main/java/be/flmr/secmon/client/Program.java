@@ -1,19 +1,13 @@
 package be.flmr.secmon.client;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import be.flmr.secmon.core.pattern.IProtocolPacket;
 import be.flmr.secmon.core.pattern.PatternGroup;
-import be.flmr.secmon.core.pattern.ProtocolPacket;
-import be.flmr.secmon.core.pattern.ProtocolPattern;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+
+import java.io.PrintStream;
+import java.util.concurrent.Callable;
 
 @Command(name = "monitor", mixinStandardHelpOptions = true, version = "monitor 1.0", description = "Console for interation with daemon")
 public class Program implements Callable<Integer>{
@@ -39,7 +33,7 @@ public class Program implements Callable<Integer>{
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
 
         Client client = new Client(System.out,host,port);
         if(verify()){

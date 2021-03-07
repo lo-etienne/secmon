@@ -6,7 +6,6 @@ import be.flmr.secmon.core.net.IServer;
 import be.flmr.secmon.core.pattern.IProtocolPacket;
 import be.flmr.secmon.core.pattern.ProtocolPacket;
 import be.flmr.secmon.core.router.AbstractRouter;
-import be.flmr.secmon.core.security.AESUtils;
 import be.flmr.secmon.core.security.Base64AesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

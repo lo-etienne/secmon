@@ -1,17 +1,16 @@
 package be.flmr.secmon.probemc.service;
 
 import be.flmr.secmon.core.net.IService;
-import be.flmr.secmon.core.net.Service;
 import be.flmr.secmon.core.pattern.PatternGroup;
 import be.flmr.secmon.core.pattern.PatternUtils;
 import be.flmr.secmon.probe.service.ServiceProber;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 
-import java.io.*;
-import java.net.InetAddress;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 

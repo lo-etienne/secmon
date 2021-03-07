@@ -1,13 +1,13 @@
 package be.flmr.secmon.client;
 
-import be.flmr.secmon.core.net.IProtocolPacketReceiver;
 import be.flmr.secmon.core.net.IProtocolPacketSender;
 import be.flmr.secmon.core.pattern.*;
-import be.flmr.secmon.core.router.AbstractRouter;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
-import java.net.Socket;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;

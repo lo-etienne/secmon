@@ -3,7 +3,8 @@ package be.flmr.secmon.daemon.net;
 import be.flmr.secmon.core.net.IClient;
 import be.flmr.secmon.core.net.IProtocolPacketReceiver;
 import be.flmr.secmon.core.net.IProtocolPacketSender;
-import be.flmr.secmon.core.pattern.*;
+import be.flmr.secmon.core.pattern.IProtocolPacket;
+import be.flmr.secmon.core.pattern.ProtocolPacket;
 import be.flmr.secmon.core.router.AbstractRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -53,8 +53,7 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
         try {
             final String message = bufferedReader.readLine() + "\r\n";
             LOG.info("Message reçu de {} : {}", socket.getInetAddress(), message);
-            IProtocolPacket protocolPacket = ProtocolPacket.from(message);
-            return protocolPacket;
+            return ProtocolPacket.from(message);
         } catch (SocketException | SSLException socketException) {
             LOG.info("Client déconnecté");
             disconnected = true;
@@ -78,7 +77,7 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
     public void close() {
         try {
             this.socket.close();
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
 
     }
 }

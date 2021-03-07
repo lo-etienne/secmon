@@ -1,6 +1,5 @@
 package be.flmr.secmon.daemon.config;
 
-import be.flmr.secmon.core.net.IService;
 import be.flmr.secmon.core.net.Service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,7 +7,7 @@ import com.google.gson.JsonIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.Writer;
 
 public class DaemonJSONConfigurationWriter implements IDaemonConfigurationWriter {
 

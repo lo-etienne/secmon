@@ -1,6 +1,5 @@
 package be.flmr.secmon.daemon;
 
-import be.flmr.secmon.core.multicast.ConnectionBroadcaster;
 import be.flmr.secmon.daemon.config.DaemonJSONConfig;
 import be.flmr.secmon.daemon.config.DaemonJSONConfigurationReader;
 import be.flmr.secmon.daemon.net.NorthPole;
@@ -11,12 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.StringWriter;
 import java.util.Objects;
 import java.util.Scanner;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -60,22 +56,4 @@ public class DaemonApp {
         }
     }
 
-}
-
-class NorthTest {
-    public static void main(String[] args) {
-        final File file = new File(Objects.requireNonNull(DaemonApp.class.getClassLoader().getResource("monitor.json")).getFile());
-        DaemonJSONConfig daemonJSONConfig;
-
-        try (DaemonJSONConfigurationReader daemonJSONConfigurationReader = new DaemonJSONConfigurationReader(new FileReader(file))) {
-            daemonJSONConfig = daemonJSONConfigurationReader.read();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        ServiceStateStack serviceStateStack = new ServiceStateStack();
-        NorthPole northPole = new NorthPole(daemonJSONConfig, serviceStateStack);
-
-        northPole.run();
-    }
 }

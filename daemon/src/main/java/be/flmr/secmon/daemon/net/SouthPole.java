@@ -1,23 +1,28 @@
 package be.flmr.secmon.daemon.net;
 
 import be.flmr.secmon.core.net.*;
-import be.flmr.secmon.core.pattern.*;
+import be.flmr.secmon.core.pattern.IProtocolPacket;
+import be.flmr.secmon.core.pattern.PatternGroup;
+import be.flmr.secmon.core.pattern.ProtocolPacketBuilder;
+import be.flmr.secmon.core.pattern.ProtocolPattern;
 import be.flmr.secmon.core.router.AbstractRouter;
 import be.flmr.secmon.core.router.Protocol;
-import be.flmr.secmon.daemon.config.*;
+import be.flmr.secmon.daemon.config.DaemonJSONConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocket;
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseable, IServer {
 

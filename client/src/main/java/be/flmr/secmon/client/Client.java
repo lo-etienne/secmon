@@ -66,6 +66,7 @@ public class Client implements IProtocolPacketSender{
                 .withGroup(PatternGroup.AUGMENTEDURL,group)
                 .build();
         send(packet);
+        receive();
     }
 
     public void listSrvReq(){
@@ -73,6 +74,7 @@ public class Client implements IProtocolPacketSender{
                 .withPatternType(ProtocolPattern.LIST_SERVICE_REQ)
                 .build();
         send(packet);
+        receive();
     }
 
     public void stateSrvReq(String group){
@@ -81,9 +83,10 @@ public class Client implements IProtocolPacketSender{
                 .withGroup(PatternGroup.ID,group)
                 .build();
         send(packet);
+        receive();
     }
 
-    public void receive(){
+    private void receive(){
         try {
             String str = buffered.readLine();
             IProtocolPacket packet = ProtocolPacket.from(str);

@@ -1,11 +1,14 @@
 package be.flmr.secmon.client;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import be.flmr.secmon.core.pattern.IProtocolPacket;
 import be.flmr.secmon.core.pattern.PatternGroup;
+import be.flmr.secmon.core.pattern.ProtocolPacket;
 import be.flmr.secmon.core.pattern.ProtocolPattern;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -30,9 +33,6 @@ public class Program implements Callable<Integer>{
     private String port = "42069";
 
     private PrintStream stream;
-    private String add_service_req;
-    private String list_service_req;
-    private String state_service_req;
 
     public Program(){
         this.stream = System.out;
@@ -42,20 +42,19 @@ public class Program implements Callable<Integer>{
     public Integer call() throws Exception {
 
         Client client = new Client(System.out,host,port);
-        verifie();
-        if(!(add_service_req.isEmpty())){
-            if(add_service_req.matches(PatternGroup.AUGMENTEDURL.getPattern()))
-                client.addSrvReq(add_service_req);
+        if(verify()){
+            switch(typeService) {
+                case "add-service":
+                    client.addSrvReq(parameterService);
+                    break;
+                case "list-service":
+                    client.listSrvReq();
+                    break;
+                case "state-service":
+                    client.stateSrvReq(parameterService);
+                    break;
+            }
         }
-        if((list_service_req.isEmpty())){
-            if(list_service_req.equals(""))
-                client.listSrvReq();
-        }
-        if(!(state_service_req.isEmpty())){
-            if(state_service_req.matches(PatternGroup.ID.getPattern()))
-                client.stateSrvReq(state_service_req);
-        }
-        client.receive();
         return 0;
     }
 
@@ -65,21 +64,21 @@ public class Program implements Callable<Integer>{
         System.exit(exitCode);
     }
 
-    private boolean verifie(){
+    private boolean verify(){
         switch(typeService) {
             case "add-service":
-                return verifieContent(ProtocolPattern.ADD_SERVICE_REQ);
+                return verifyContent(PatternGroup.AUGMENTEDURL);
             case "list-service":
-                return verifieContent(ProtocolPattern.LIST_SERVICE_REQ);
+                return true;
             case "state-service":
-                return verifieContent(ProtocolPattern.STATE_SERVICE_REQ);
+                return verifyContent(PatternGroup.ID);
             default:
                 stream.print("Mauvaise commande");
                 return false;
         }
     }
 
-    private boolean verifieContent(ProtocolPattern protocol) {
-        return parameterService.matches(protocol.getPattern());
+    private boolean verifyContent(PatternGroup group) {
+        return parameterService.matches(group.getPattern());
     }
 }

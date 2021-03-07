@@ -8,6 +8,7 @@ import be.flmr.secmon.core.router.AbstractRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -54,7 +55,7 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
             LOG.info("Message reçu de {} : {}", socket.getInetAddress(), message);
             IProtocolPacket protocolPacket = ProtocolPacket.from(message);
             return protocolPacket;
-        } catch (SocketException socketException) {
+        } catch (SocketException | SSLException socketException) {
             LOG.info("Client déconnecté");
             disconnected = true;
         } catch (Exception exception) {

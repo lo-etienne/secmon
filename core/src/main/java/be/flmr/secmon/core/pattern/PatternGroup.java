@@ -22,7 +22,7 @@ public enum PatternGroup implements IEnumPattern {
     MIN("(" + PatternGroup.DIGIT + "){1,8}"),
     MAX("(" + PatternGroup.DIGIT + "){1,8}"),
     FREQUENCY("(" + PatternGroup.DIGIT + "){1,8}"),
-    STATE(Arrays.stream(ServiceState.values()).map(ServiceState::name).reduce("", (a,b) -> (a.isEmpty() ? "" : "|") + a + b)),
+    STATE(Arrays.stream(ServiceState.values()).map(ServiceState::name).reduce("", (a,b) -> a + (a.isEmpty() ? "" : "|") + b)),
     MESSAGE("(" + PatternGroup.CHARACTER + "){1,200}"),
     URL(PROTOCOL.getPattern() + "://" + "(" + USERNAME.getPattern() + "(:" + PASSWORD.getPattern()
             + ")?" + "@)?" + HOST.getPattern() + "(:" + PORT.getPattern() + ")?" + PATH.getPattern()),

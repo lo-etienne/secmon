@@ -27,11 +27,13 @@ public class Program {
 
             ProbeServer server = new ProbeServer(reader, multicastSender, new HttpsServiceProber());
 
-            Executors.newSingleThreadExecutor().submit(server);
+            var executor = Executors.newSingleThreadExecutor();
+            executor.execute(server);
 
             while(!scanner.nextLine().equals("quit"));
 
             server.close();
+            executor.shutdown();
         } catch(NullPointerException e) {
             log.error(e.getMessage(), e);
             System.exit(-1);

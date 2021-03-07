@@ -21,7 +21,7 @@ public class Base64AesUtils {
     public static synchronized String encrypt(String input, String key) {
         if (!ENCRYPTION) return input;
         try {
-            return Base64.getEncoder().encodeToString(initCipher(key, Cipher.ENCRYPT_MODE).doFinal(input.getBytes(StandardCharsets.UTF_8)));
+            return Base64.getEncoder().encodeToString(initCipher(key, Cipher.ENCRYPT_MODE).doFinal(input.getBytes(StandardCharsets.UTF_8))) + "\r\n";
         } catch (IllegalBlockSizeException | BadPaddingException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeyException e) {
             throw new RuntimeException("Il y a eu une exception lors de l'encryption");
         }

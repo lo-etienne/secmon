@@ -39,8 +39,10 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
     private String aesKey;
 
     private static final Logger log = LoggerFactory.getLogger(ProbeServer.class);
+    private boolean shutdown = false;
 
     public ProbeServer(ProbeJSONConfigurationReader reader, ConnectionBroadcaster multicastSender, ServiceProber prober) {
+        super();
         try {
             socket = new ServerSocket(Integer.parseInt(reader.getMulticastPort()));
         } catch(IOException e) {
@@ -80,14 +82,15 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
 
                 log.debug("Client connecté - {}", client.getInetAddress());
             } catch(IOException e) {
-                e.printStackTrace();
+                log.warn("Le socket a été terminé, extinction du serveur...");
+                if (socket.isClosed()) shutdown = true;
             }
         }
     }
 
     @Override
     public boolean isShuttingDown() {
-        return false;
+        return shutdown;
     }
 
     @Override
@@ -142,5 +145,6 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
         }
         this.executor.shutdown();
         this.socket.close();
+        multicastSender.close();
     }
 }

@@ -45,7 +45,7 @@ public class NorthPole extends AbstractRouter implements INorthPole {
     @Override
     public void run() {
         log.info("Lancement du pôle nord");
-        while(running) {
+        while (running) {
             IProtocolPacket receivedPacket = multicast.receive();
             executor.execute(() -> execute(receivedPacket.getSourceAddress(), receivedPacket));
         }
@@ -68,12 +68,13 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         String host = ((InetAddress) sender).getHostAddress();
         int port = Integer.parseInt(packet.getValue(PatternGroup.PORT));
 
-        try {
-            if (!socket.isConnected()) socket.connect(new InetSocketAddress(host, port));
+        try (Socket socket = new Socket(host, port)) {
+            log.info("Envoi de la configuration {}", config.buildMessage());
             write(config, socket);
-            socket.close();
         } catch (IOException e) {
             log.error("Erreur lors de l'envoi d'une réponse à ANNOUNCE (CURCONFIG)", e);
+        } finally {
+            log.info("Déconnexion du probe...");
         }
     }
 
@@ -88,13 +89,13 @@ public class NorthPole extends AbstractRouter implements INorthPole {
         String host = ((InetAddress) sender).getHostAddress();
         int port = Integer.parseInt(packet.getValue(PatternGroup.PORT));
 
-        try {
-            if (!socket.isConnected()) socket.connect(new InetSocketAddress(host, port));
+        try (Socket socket = new Socket(host, port)) {
             for (IService service : services) {
-                write(newStateReq(service.getID()), socket);
+                var req = newStateReq(service.getID());
+                log.info("Envoi de la requête de statut {}", req.buildMessage());
+                write(req, socket);
                 execute(socket, read(socket));
             }
-            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -103,33 +104,34 @@ public class NorthPole extends AbstractRouter implements INorthPole {
     @Protocol(pattern = ProtocolPattern.STATE_RESP)
     private void onStateResponse(Object sender, IProtocolPacket packet) {
         log.info("Réception d'un STATEREQ de {}", sender);
-        List<IService> services = Service.from(packet);
-        services.forEach(service -> {
-            if (!stateStack.hasService(service)) stateStack.registerService(service);
-            stateStack.pushState(service, ServiceState.valueOf(packet.getValue(PatternGroup.STATE)));
-        });
+        daemonJSONConfig.getServices().stream()
+                .filter(service -> service.getID().equals(packet.getValue(PatternGroup.ID)))
+                .forEach(service -> {
+                    if (!stateStack.hasService(service)) stateStack.registerService(service);
+                    stateStack.pushState(service, ServiceState.valueOf(packet.getValue(PatternGroup.STATE)));
+                });
     }
 
-    private IProtocolPacket read(Socket s) {
+    private synchronized IProtocolPacket read(Socket s) {
         try {
             var in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = in.readLine();
             String decrypted = Base64AesUtils.decrypt(line, daemonJSONConfig.getAesKey());
             return ProtocolPacket.from(decrypted);
         } catch (IOException e) {
-            log.error("Le message n'as pas pû être reçu de {}", s.getInetAddress());
-            throw new IllegalArgumentException();
+            log.error("Le message n'as pas pû être reçu");
+            throw new IllegalArgumentException(e);
         }
     }
 
-    private void write(IProtocolPacket packet, Socket s) {
+    private synchronized void write(IProtocolPacket packet, Socket s) {
         try {
             var out = new PrintWriter(s.getOutputStream());
             String encrypted = Base64AesUtils.encrypt(packet.buildMessage(), daemonJSONConfig.getAesKey());
             out.print(encrypted);
             out.flush();
         } catch (IOException e) {
-            log.error("Le message n'as pas pû être envoyé vers {}", s.getInetAddress());
+            log.error("Le message {} n'as pas pû être envoyé", packet.buildMessage());
         }
     }
 
@@ -142,7 +144,12 @@ public class NorthPole extends AbstractRouter implements INorthPole {
 
     @Override
     public void close() {
-        running = false;
-        executor.shutdown();
+        try {
+            running = false;
+            multicast.close();
+            executor.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

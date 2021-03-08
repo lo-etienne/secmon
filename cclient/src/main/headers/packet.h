@@ -1,4 +1,3 @@
-
 struct packet {
     char *prefix;
 };

@@ -137,62 +137,60 @@ void help()
 //    0      1       2          3           4        5
 // [path] [host] [command] [parameter] [-p|--port] [port]
 
-int main(int argc, char **argv)
+int ouille(int argc, char **argv)
 {
     char *host, *command, *parameter, *port;
+    port = (char *)malloc(5 * sizeof(char *));
+    *host = '\0';
+    *command = '\0';
+    *parameter = '\0';
+    strcpy(port, "42069");
 
-    std::regex host_regex, command_regex, parameter_regex, port_regex;
+    std::regex host_regex = std::regex(HOST);
+    std::regex command_regex = std::regex("(add\\-service|list\\-service|state\\-service)");
+    std::regex parameter_regex = std::regex("(" AUGMENTED_URL "|" ID ")");
+    std::regex port_regex = std::regex(PORT);
 
-    try
+    if (argc < 3)
     {
-        host_regex = std::regex(HOST);
-    } catch (std::regex_error e) {
-        fprintf(stderr, "%s: host_regex\n", e.what());
-        exit(-1);
-    }
-
-    try
-    {
-        command_regex = std::regex("[(add-service)|(list-service)|(state-service)]");
-    } catch (std::regex_error e) {
-        fprintf(stderr, "%s: command_regex\n", e.what());
-        exit(-1);
-    }
-
-    try
-    {
-        parameter_regex = std::regex("(" AUGMENTED_URL "|" ID ")");
-    } catch (std::regex_error e) {
-        fprintf(stderr, "%s: parameter_regex\n", e.what());
-        exit(-1);
-    }
-
-    try
-    {
-        host_regex = std::regex(HOST);
-    } catch (std::regex_error e) {
-        fprintf(stderr, "%s: host_regex\n", e.what());
+        fprintf(stderr, "Erreur dans la syntaxe de la commande: pas assez d'arguments.\n");
+        help();
         exit(-1);
     }
 
     for (int i = 1; i < argc; ++i)
     {
-        if (std::regex_match(argv[i], host_regex))
-            host = argv[i];
-
-        if (std::regex_match(argv[i], command_regex))
-            command = argv[i];
-
-        if (std::regex_match(argv[i], parameter_regex))
-            parameter = argv[i];
-        else
+        if (i == 1)
         {
-            if (!strcmp(command, "list-service"))
+            host = argv[i];
+            if (!std::regex_match(host, host_regex))
             {
-                fprintf(stderr, "Il manque un paramètre à la commande %s\n", command);
+                fprintf(stderr, "Erreur dans la syntaxe de la commande: le host n'est pas valide.\n");
+                help();
                 exit(-1);
             }
-            parameter = "";
+        }
+
+        if (i == 2)
+        {
+            command = argv[i];
+            if (!std::regex_match(command, command_regex))
+            {
+                fprintf(stderr, "Erreur dans la syntaxe de la commande: la commande n'est pas valide.\n");
+                help();
+                exit(-1);
+            }
+        }
+
+        if (i == 3)
+        {
+            parameter = argv[i];
+            if (!strcmp(command, "list-service"))
+            {
+                fprintf(stderr, "Erreur dans la syntaxe de la commande: il manque un paramètre !\n");
+                help();
+                exit(-1);
+            }
         }
 
         if (strcmp(argv[i], "-p") == 0 ||
@@ -200,7 +198,7 @@ int main(int argc, char **argv)
         {
             if (i + 1 == argc)
             {
-                fprintf(stderr, "Il n'y a aucun port spécifié\n");
+                fprintf(stderr, "Erreur dans la syntaxe de la commande: il n'y a aucun port spécifié.\n");
                 help();
                 exit(-1);
             }
@@ -209,10 +207,9 @@ int main(int argc, char **argv)
         }
     }
 
-    std::cout << host << std::endl;
-    std::cout << command << std::endl;
-    std::cout << parameter << std::endl;
-    std::cout << port << std::endl;
+    //struct client_socket *client = client_connect(host, port);
+
+    free(port);
 
     return 0;
 }

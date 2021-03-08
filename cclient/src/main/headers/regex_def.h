@@ -23,18 +23,19 @@
 #define SRVLIST             "(" SP ID "){0,100}"
 #define OPTIONAL_MESSAGE    "(" SP MESSAGE ")"
 
-#define _ADD_SERVICE_REQ(augmented_url)         "ADDSRV" SP augmented_url CRLF
-#define _ADD_SERVICE_RESP_OK(optional_message)  "\\+OK" optional_message CRLF
-#define _ADD_SERVICE_RESP_ERR(optional_message) "-ERR" optional_message CRLF
-#define _LIST_SERVICE_REQUEST                   "LISTSRV" CRLF
-#define _LIST_SERVICE_RESPONSE(list)            "SRV" list CRLF
-#define _STATE_SERVICE_REQUEST(id)              "STATESRV" SP id CRLF
-#define _STATE_SERVICE_RESPONSE(id, url, state) "STATERESP" SP id SP url SP state CRLF
+#define _ADD_SERVICE_REQ(augmented_url)         "ADDSRV " augmented_url
+#define _ADD_SERVICE_RESP_OK(optional_message)  "\\+OK" optional_message
+#define _ADD_SERVICE_RESP_ERR(optional_message) "-ERR" optional_message
+#define _LIST_SERVICE_REQUEST                   "LISTSRV"
+#define _LIST_SERVICE_RESPONSE(list)            "SRV" list
+#define _STATE_SERVICE_REQUEST(id)              "STATESRV " id
+#define _STATE_SERVICE_RESPONSE(id, url, state) "STATERESP" SP id SP url SP state
 
-#define ADD_SERVICE_REQ_REGEX           _ADD_SERVICE_REQ(AUGMENTED_URL)
-#define ADD_SERVICE_RESP_OK_REGEX       _ADD_SERVICE_RESP_OK(OPTIONAL_MESSAGE)
-#define ADD_SERVICE_RESP_ERR_REGEX      _ADD_SERVICE_RESP_ERR(OPTIONAL_MESSAGE)
-#define LIST_SERVICE_REQUEST_REGEX      _LIST_SERVICE_REQUEST
-#define LIST_SERVICE_RESPONSE_REGEX     _LIST_SERVICE_RESPONSE(SRVLIST)
-#define STATE_SERVICE_REQUEST_REGEX     _STATE_SERVICE_REQUEST(ID)
-#define STATE_SERVICE_RESPONSE_REGEX    _STATE_SERVICE_RESPONSE(ID, URL, STATE)
+#define ADD_SERVICE_REQ(augmented_url)  _ADD_SERVICE_REQ(augmented_url) "\r\n"
+#define LIST_SERVICE_REQUEST            _LIST_SERVICE_REQUEST "\r\n"
+#define STATE_SERVICE_REQUEST(id)       _STATE_SERVICE_REQUEST(id) "\r\n"
+
+#define ADD_SERVICE_RESP_OK_REGEX       _ADD_SERVICE_RESP_OK(OPTIONAL_MESSAGE) CRLF
+#define ADD_SERVICE_RESP_ERR_REGEX      _ADD_SERVICE_RESP_ERR(OPTIONAL_MESSAGE) CRLF
+#define LIST_SERVICE_RESPONSE_REGEX     _LIST_SERVICE_RESPONSE(SRVLIST) CRLF
+#define STATE_SERVICE_RESPONSE_REGEX    _STATE_SERVICE_RESPONSE(ID, URL, STATE) CRLF

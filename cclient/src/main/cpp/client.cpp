@@ -68,18 +68,24 @@ struct client_socket *client_connect(char *hostname, char *port)
         fprintf(stderr, "%s: %s\n", hostname, strerror(err));
     } 
 
-    sc.fd = sfd;
+    cs.fd = sfd;
 
-    sc.ctx = init_ctx();
-    sc.ssl = SSL_new(sc.ctx);
+    cs.ctx = init_ctx();
+    cs.ssl = SSL_new(cs.ctx);
 
-    return sc;
+    return cs;
 }
 
-void send(char* message, client_socket* cs) {
-
+void client_send(char* message, client_socket* cs) {
+    SSL_write(cs.ssl, message, strlen(message));
 }
 
-void receive(client_socket* cs) {
+void client_receive(char* buff, int buff_len, client_socket* cs) {
+    SSL_read(cs.ssl, buff, buff_len);
+}
 
+void client_free(client_socket* cs) {
+    SSL_free(cs.ssl);
+    close(cs.fd);
+    SSL_CTX_free(cs.ctx);
 }

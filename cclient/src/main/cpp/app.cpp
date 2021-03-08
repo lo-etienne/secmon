@@ -207,7 +207,18 @@ int ouille(int argc, char **argv)
         }
     }
 
-    //struct client_socket *client = client_connect(host, port);
+    struct client_socket *client = client_connect(host, port);
+    char buffer[1024];
+
+    if(!strcmp(command, "add-service")) {
+        client_send(ADD_SERVICE_REQ(parameter) , client);
+    } else if(!strcmp(command, "list-service")) {
+        client_send(LIST_SERVICE_REQ, client);
+    } else if(!strcmp(command, "state-service")) {
+        client_send(STATE_SERVICE_REQ(parameter), client);
+    }
+
+    client_receive(buffer, 1024, client);
 
     free(port);
 

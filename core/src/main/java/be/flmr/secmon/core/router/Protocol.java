@@ -10,5 +10,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Protocol {
+    /**
+     * @return le {@link ProtocolPattern} qui détermine si la méthode devra être exécutée ou non par {@link AbstractRouter::execute}
+     */
     ProtocolPattern pattern();
 }

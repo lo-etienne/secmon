@@ -2,7 +2,7 @@ package be.flmr.secmon.daemon;
 
 import be.flmr.secmon.daemon.config.DaemonJSONConfig;
 import be.flmr.secmon.daemon.config.DaemonJSONConfigurationReader;
-import be.flmr.secmon.daemon.net.NorthPole;
+import be.flmr.secmon.daemon.net.ProbeCommunicator;
 import be.flmr.secmon.daemon.net.ServiceStateStack;
 import be.flmr.secmon.daemon.net.SocketFactory;
 import be.flmr.secmon.daemon.net.SouthPole;
@@ -33,11 +33,11 @@ public class DaemonApp {
 
         ServiceStateStack serviceStateStack = new ServiceStateStack();
         SouthPole southPole = new SouthPole(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
-        NorthPole northPole = new NorthPole(daemonJSONConfig, serviceStateStack);
+        ProbeCommunicator probeCommunicator = new ProbeCommunicator(daemonJSONConfig, serviceStateStack);
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
-        executor.execute(northPole);
+        executor.execute(probeCommunicator);
         executor.execute(southPole);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

@@ -28,7 +28,7 @@ public class RouterTest {
     final void setup() {
         verify = false;
         parameter = "";
-        router = RouterLoader.loadRouter(RouterStub.class);
+        router = new RouterStub();
     }
 
     @Test
@@ -70,6 +70,10 @@ public class RouterTest {
     }
 
     private static class RouterStub extends AbstractRouter {
+        public RouterStub() {
+            super();
+        }
+
         @Protocol(pattern = ANNOUNCE)
         public void hello(Object sender, IProtocolPacket packet) {
             verify = true;

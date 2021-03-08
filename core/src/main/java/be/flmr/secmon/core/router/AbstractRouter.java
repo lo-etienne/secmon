@@ -8,10 +8,17 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Classe abstraite à hériter pour utiliser les annotations {@link Protocol}. Ces annotations sont utilisés lorsque,
+ * quand {@code execute} est executé avec un {@link IProtocolPacket} de type X, les méthodes annotées par {@link Protocol}
+ * et renseignée avec un {@link ProtocolPattern} de type X, alors cette méthode est executée
+ */
 public abstract class AbstractRouter {
-    // Injected
     private Map<Method, ProtocolPattern> protocols;
 
+    /**
+     * Constructeur de l'abstract router. Il faut absolument qu'il soit exécuté sinon les routers ne foncitonnent pas.
+     */
     public AbstractRouter() {
         var type = getClass();
         protocols = new HashMap<>();
@@ -25,6 +32,11 @@ public abstract class AbstractRouter {
         }
     }
 
+    /**
+     * Méthode d'exécution des méthodes annotées par {@link Protocol}.
+     * @param sender objet "sender", parfois utile dans certains cas
+     * @param input le packet qui provoquera l'éxécution de telle ou telle méthode.
+     */
     public final void execute(Object sender, IProtocolPacket input) {
         for (Map.Entry<Method, ProtocolPattern> entry : protocols.entrySet()) {
             Method method = entry.getKey();

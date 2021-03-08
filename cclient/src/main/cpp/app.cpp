@@ -71,23 +71,23 @@ int open_connection(const char *hostname, const char *port)
     return sfd;
 }
 
-void display_certs(SSL *ssl)
+void display_certs(SSL *ssl, FILE* fd)
 {
     X509 *cert = SSL_get_peer_certificate(ssl);
     if (cert != nullptr)
     {
-        printf("Server certificates:\n");
+        fprintf(fd, "Server certificates:\n");
         char *line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-        printf("Subject: %s\n", line);
+        fprintf(fd, "Subject: %s\n", line);
         delete line;
         line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-        printf("Issuer: %s\n", line);
+        fprintf(fd, "Issuer: %s\n", line);
         delete line;
         X509_free(cert);
     }
     else
     {
-        printf("Info: No client certificates configured. \n");
+        fprintf(fd, "Info: No client certificates configured. \n");
     }
 }
 

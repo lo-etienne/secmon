@@ -15,5 +15,6 @@ struct client_socket
     char* port;
 };
 
-struct client_socket *connect(char*, char*);
-void send(char*);
+struct client_socket *client_connect(char*, char*);
+void send(char*, client_socket*);
+void receive(client_socket*);

@@ -2,6 +2,7 @@ package be.flmr.secmon.core.pattern;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -90,5 +91,10 @@ public enum ProtocolPattern implements IEnumPattern {
             if (input.matches(protocol.getPattern())) return protocol;
         }
         throw new IllegalArgumentException(String.format("Le paramètre %s ne correspond à aucun patterns !", input));
+    }
+
+    public static void main(String[] args) {
+        Arrays.stream(ProtocolPattern.values())
+                .forEach(p -> System.out.printf("%s: %s\n", p.name(), p.getPattern().replace("\\", "\\\\")));
     }
 }

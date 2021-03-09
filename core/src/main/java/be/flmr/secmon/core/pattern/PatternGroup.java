@@ -66,4 +66,9 @@ public enum PatternGroup implements IEnumPattern {
     public String getPattern() {
         return special ? pattern : String.format("(?<%s>%s)", name(), pattern);
     }
+
+    public static void main(String[] args) {
+        Arrays.stream(PatternGroup.values())
+                .forEach(p -> System.out.printf("%s: %s\n", p.name(), p.getPattern().replace("\\", "\\\\")));
+    }
 }

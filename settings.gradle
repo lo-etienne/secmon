@@ -6,4 +6,5 @@ include 'probe'
 include 'client'
 include 'probesnmp'
 include 'probemc'
+include 'cclient'
 

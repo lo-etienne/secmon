@@ -52,6 +52,7 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
     public IProtocolPacket receive() {
         try {
             final String message = bufferedReader.readLine() + "\r\n";
+            if (message.equals("null")) return null;
             LOG.info("Message reçu de {} : {}", socket.getInetAddress(), message);
             return ProtocolPacket.from(message);
         } catch (SocketException | SSLException socketException) {

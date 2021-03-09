@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.*;
 
-public class ProbeServiceCommunicator {
+public class ProbeServiceCommunicator implements AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(ProbeServiceCommunicator.class);
     private ScheduledExecutorService executor;
 
@@ -69,5 +69,11 @@ public class ProbeServiceCommunicator {
 
     public void setOnNewValue(Runnable runnable) {
         this.onNewValue = runnable;
+    }
+
+    @Override
+    public void close() {
+        log.info("Fermeture de la communication des services...");
+        executor.shutdown();
     }
 }

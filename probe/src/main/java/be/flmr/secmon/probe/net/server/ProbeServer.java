@@ -143,6 +143,7 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
         for (Map.Entry<ProbeClient, Future<?>> entry : this.clients.entrySet()) {
             entry.getKey().close();
         }
+        this.communicator.close();
         this.executor.shutdown();
         this.socket.close();
         multicastSender.close();

@@ -80,30 +80,30 @@ int main(int argc, char **argv)
 
     if (!strcmp(command, "add-service"))
     {
-        char *send_buff = (char *)malloc((9 + strlen(parameter)) * sizeof(char));
-        memset(send_buff, 0, (9 + strlen(parameter)) * sizeof(char));
+        char *send_buff = (char *)malloc((8 + strlen(parameter)) * sizeof(char));
+        memset(send_buff, 0, (8 + strlen(parameter)) * sizeof(char));
         int param_length = strlen(parameter);
 
         strncpy(send_buff, "ADDSRV ", 7);
         strncpy(send_buff + 7, parameter, param_length);
-        strncpy(send_buff + 7 + param_length, "\r\n", 2);
+        strncpy(send_buff + 7 + param_length, "\r\n\0", 3);
 
         client_send(send_buff, client);
         free(send_buff);
     }
     else if (!strcmp(command, "list-service"))
     {
-        client_send("LISTSRV\r\n", client);
+        client_send("LISTSRV\r\n\0", client);
     }
     else if (!strcmp(command, "state-service"))
     {
-        char *send_buff = (char *)malloc((9 + strlen(parameter)) * sizeof(char));
-        memset(send_buff, 0, (9 + strlen(parameter)) * sizeof(char));
+        char *send_buff = (char *)malloc((10 + strlen(parameter)) * sizeof(char));
+        memset(send_buff, 0, (10 + strlen(parameter)) * sizeof(char));
         int param_length = strlen(parameter);
 
-        strncpy(send_buff, "STATEREQ ", 9);
+        strncpy(send_buff, "STATESRV ", 9);
         strncpy(send_buff + 9, parameter, param_length);
-        strncpy(send_buff + 9 + param_length, "\r\n", 2);
+        strncpy(send_buff + 9 + param_length, "\r\n\0", 3);
 
         client_send(send_buff, client);
         free(send_buff);

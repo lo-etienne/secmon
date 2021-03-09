@@ -30,11 +30,11 @@ public class Client implements IProtocolPacketSender{
         try {
             char[] pwd = "group5".toCharArray();
 
-            InputStream is = new FileInputStream("C:\\Users\\Robin\\Desktop\\cours reseaux\\GodSwilaTrustMeIntermediateCA.crt");
-            InputStream ist = new FileInputStream("C:\\Users\\Robin\\Desktop\\cours reseaux\\GodSwilaTrustMeRootCA.crt");
+            InputStream is = getClass().getClassLoader().getResourceAsStream("GodSwilaTrustMeIntermediateCA.crt");
+            InputStream ist = getClass().getClassLoader().getResourceAsStream("GodSwilaTrustMeRootCA.crt");
 
-            X509Certificate ca = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new BufferedInputStream(is));
-            X509Certificate ce = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new BufferedInputStream(ist));
+            X509Certificate ca = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
+            X509Certificate ce = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(ist);
 
             KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
             ks.load(null,null);

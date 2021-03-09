@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <resolv.h>
-#include <netdb.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -17,5 +16,5 @@ struct client_socket
 
 struct client_socket *client_connect(char*, char*);
 void client_send(char*, client_socket*);
-char* client_receive(char*, int, client_socket*);
+void client_receive(char*, int, client_socket*);
 void client_free(client_socket*);

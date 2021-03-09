@@ -9,10 +9,11 @@ import picocli.CommandLine.Parameters;
 import java.io.PrintStream;
 import java.util.concurrent.Callable;
 
+/**
+ * Class qui recupere et verifie les entree du user puis fais appel a la class client pour exploiter les entree
+ */
 @Command(name = "monitor", mixinStandardHelpOptions = true, version = "monitor 1.0", description = "Console for interation with daemon")
 public class Program implements Callable<Integer>{
-
-    private ProtocolClient protocol;
 
     @Parameters(index = "0", description = "host")
     private String host = "localhost";
@@ -34,7 +35,6 @@ public class Program implements Callable<Integer>{
 
     @Override
     public Integer call() {
-
         Client client = new Client(System.out,host,port);
         if(verify()){
             switch(typeService) {
@@ -57,6 +57,10 @@ public class Program implements Callable<Integer>{
         System.exit(exitCode);
     }
 
+    /**
+     * Methode qui verifie si le type de service est un type de service correct et valide les paramettre de ces dernier
+     * @return true si l'utilisateur a encoder un bon service et false si il na pas encoder un bon service
+     */
     private boolean verify(){
         switch(typeService) {
             case "add-service":
@@ -71,6 +75,11 @@ public class Program implements Callable<Integer>{
         }
     }
 
+    /**
+     * Methode qui verifie si ce que l'utilisateur entre repond au pattern
+     * @param group et le pattern que l'entree doit correspondre
+     * @return true si le pattern valide le parameterService et false si ne le valide pas
+     */
     private boolean verifyContent(PatternGroup group) {
         return parameterService.matches(group.getPattern());
     }

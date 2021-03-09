@@ -16,11 +16,20 @@ public class ProtocolClient extends AbstractRouter {
 
     private PrintStream stream;
 
+    /**
+     * Constucteur de ProtocolClient
+     * @param writer PrintStream pour afficher des messages
+     */
     public ProtocolClient(PrintStream writer){
         super();
         this.stream = writer;
     }
 
+    /**
+     * Methode verifient le packet correspond au pattern, et affiche un message particulier sur le stream
+     * @param obj
+     * @param packet ProtocolPacket contenant les information necessaire
+     */
     @Protocol(pattern = ProtocolPattern.ADD_SERVICE_RESP_OK)
     private void respondServiceOk(Object obj, IProtocolPacket packet){
         String str = "+OK";
@@ -32,6 +41,11 @@ public class ProtocolClient extends AbstractRouter {
         stream.println(str);
     }
 
+    /**
+     * Methode verifient le packet correspond au pattern, et affiche un message particulier sur le stream
+     * @param obj
+     * @param packet ProtocolPacket contenant les information necessaire
+     */
     @Protocol(pattern = ProtocolPattern.ADD_SERVICE_RESP_ERR)
     private void respondServiceError(Object obj, IProtocolPacket packet){
         String str = "-ERR";
@@ -43,6 +57,11 @@ public class ProtocolClient extends AbstractRouter {
         stream.println(str);
     }
 
+    /**
+     * Methode verifient le packet correspond au pattern, et affiche un message particulier sur le stream
+     * @param obj
+     * @param packet ProtocolPacket contenant les information necessaire
+     */
     @Protocol(pattern = ProtocolPattern.LIST_SERVICE_RESP)
     private void respondList(Object obj, IProtocolPacket packet){
 
@@ -53,6 +72,11 @@ public class ProtocolClient extends AbstractRouter {
         stream.println(str);
     }
 
+    /**
+     * Methode verifient le packet correspond au pattern, et affiche un message particulier sur le stream
+     * @param obj
+     * @param packet ProtocolPacket contenant les information necessaire
+     */
     @Protocol(pattern = ProtocolPattern.STATE_SERVICE_RESP)
     private void respondState(Object obj, IProtocolPacket packet){
         String str = "STATE ";

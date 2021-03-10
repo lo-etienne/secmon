@@ -17,6 +17,9 @@ import java.io.IOException;
 
 import static be.flmr.secmon.core.pattern.PatternGroup.*;
 
+/**
+ *  Classe permettant l'interrogation d'un service SNMP
+ */
 public class SnmpServiceProber implements ServiceProber {
     public static final int DEFAULT_VERSION = SnmpConstants.version2c;
     public static final String DEFAULT_PROTOCOL = "udp";
@@ -39,6 +42,12 @@ public class SnmpServiceProber implements ServiceProber {
         return target;
     }
 
+    /**
+     * Interroge un service SNMP et renvoie sa valeur ou lance une <code>IOException</code> si une erreur survient. Code inspiré par <a href="https://github.com/micmiu/snmp-tutorial/blob/master/snmp4j-1x-demo/src/main/java/com/micmiu/snmp4j/demo1x/SnmpGet.java">ce github</a>.
+     * @param service Service à interroger
+     * @return int - Valeur obtenue lors de l'interrogation du service
+     * @throws IOException lancée si une erreur est survenue lors de l'interrogation
+     */
     @Override
     public int get(IService service) throws IOException {
         CommunityTarget<Address> target = createDefault(PatternUtils.extractGroup(service.getURL(), URL, HOST.name()), PatternUtils.extractGroup(service.getURL(), URL, USERNAME.name()));

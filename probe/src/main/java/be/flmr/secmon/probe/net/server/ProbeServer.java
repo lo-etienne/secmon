@@ -22,6 +22,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.*;
 
+/**
+ * Partie de la probe chargée de la communication avec le Daemon. Elle s'annonce en multicast à une
+ * fréquence donnée et attend des connexions de Clients.
+ */
 public class ProbeServer extends AbstractRouter implements IServer, Runnable, AutoCloseable {
     private final ConnectionBroadcaster multicastSender;
     private final Map<ProbeClient, Future<?>> clients;
@@ -41,6 +45,12 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
     private static final Logger log = LoggerFactory.getLogger(ProbeServer.class);
     private boolean shutdown = false;
 
+    /**
+     * Construit une instance de {@code ProbeServer} à l'aide d'une configuration JSON, d'un broadcaster multicast et d'un {@code ServiceProber} particulier
+     * @param reader Configuration JSON de la Probe
+     * @param multicastSender Broadcaster multicast
+     * @param prober Outil permettant d'interroger un service pour un protocole donné
+     */
     public ProbeServer(ProbeJSONConfigurationReader reader, ConnectionBroadcaster multicastSender, ServiceProber prober) {
         super();
         try {
@@ -101,6 +111,11 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
         executor.execute(this::listenForConnections);
     }
 
+    /**
+     * Reçoit une configuration dans le {@code sender} et met à jour les services qu'il connaît ou les ajoute à sa liste
+     * @param sender Émetteur du message
+     * @param packet Paket envoyé par l'émetteur
+     */
     @Protocol(pattern = ProtocolPattern.CONFIG)
     private void updateServices(Object sender, IProtocolPacket packet) {
         var services = Service.from(packet);
@@ -110,6 +125,12 @@ public class ProbeServer extends AbstractRouter implements IServer, Runnable, Au
         services.forEach((service) -> this.communicator.addService(service));
     }
 
+    /**
+     * Reçoit l'identifiant d'un service dans le {@code sender}.<br>
+     * Si l'identifiant est connu, alors le service est interrogé et on répond en multicast l'état de celui-ci.
+     * @param sender Émetteur du message
+     * @param packet Paket envoyé par l'émetteur
+     */
     @Protocol(pattern = ProtocolPattern.STATE_REQ)
     private void getServiceState(Object sender, IProtocolPacket packet) {
         var id = packet.getValue(PatternGroup.ID);

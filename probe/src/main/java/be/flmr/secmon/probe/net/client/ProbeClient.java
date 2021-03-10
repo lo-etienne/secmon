@@ -17,6 +17,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
+/**
+ * Client chargé de communiquer avec le Moniteur Daemon de manière chiffrée avec AES
+ */
 public class ProbeClient implements IClient, IProtocolPacketSender, AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(ProbeClient.class);
 
@@ -44,18 +47,30 @@ public class ProbeClient implements IClient, IProtocolPacketSender, AutoCloseabl
         }
     }
 
+    /**
+     * Recoit un message chiffré avec AES et renvoie un {@code ProtocolPaket} à partir de son texte déchiffré
+     * @return Un ProtocolPacket
+     * @throws IOException si une erreur survient lors de l'I/O
+     */
     private IProtocolPacket receive() throws IOException {
         String line = in.readLine();
         log.debug("Réception du message {}", line);
         return ProtocolPacket.from(Base64AesUtils.decrypt(line, aesKey));
     }
 
+    /**
+     * Construit un message à partir d'un {@code ProtocolPacket}, le chiffre avec AES et l'envoie ensuite
+     * @param packet Un ProtocolPacket
+     */
     @Override
     public void send(IProtocolPacket packet) {
         out.print(Base64AesUtils.encrypt(packet.buildMessage(), aesKey) + "\r\n");
         out.flush();
     }
 
+    /**
+     *  Essaye de lire un {@code ProtocolPacket} pour ensuite exécuter la méthode qui lui est liée
+     */
     @Override
     public void run() {
         while (!server.isShuttingDown()) {

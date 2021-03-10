@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Thread dédié à l'interrogation de l'état d'un service
+ */
 public class ServiceThread implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(ServiceThread.class);
 
@@ -23,6 +26,15 @@ public class ServiceThread implements Runnable {
         this.prober = prober;
     }
 
+    /**
+     * Interroge le service connu pour ensuite interpreter le résultat obtenu et en déduire un état
+     * <ul>
+     *     <li>"OK" - Valeur Obtenue et comprise entre les bornes acceptées</li>
+     *     <li>"ALARM" - Valeur Obtenue et hors des bornes acceptées</li>
+     *     <li>"DOWN" - Service inatteignable</li>
+     *     <li>"NOSTATUS" - Statut initial lorsque le service n'a pas encore été interrogé</li>
+     * </ul>
+     */
     @Override
     public void run() {
         try {

@@ -5,6 +5,15 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Reader;
 
+/**
+ * Permet de lire, depuis un fichier JSON, la configuration d'une probe.
+ * <ul>
+ *     <li>Nom, Version, Protocole</li>
+ *     <li>Adresse et Port Multicast</li>
+ *     <li>Clé de chiffrement AES</li>
+ *     <li>Fréquence d'envoi d'information</li>
+ * </ul>
+ */
 public class ProbeJSONConfigurationReader implements ProbeConfigurationReader {
     private ProbeJSONConfig config;
 

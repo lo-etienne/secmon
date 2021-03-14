@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 /**
  * Énumération comprenant les différents "groupes" de patterns défninis dans les "définitions standards". Ces "groupes"
- * représentent, pour la majorité, des patterns "groupés" (i.e. (?<nom de groupe>*pattern*)).
+ * représentent, pour la majorité, des patterns "groupés" (i.e. (?&lt;nom de groupe&gt;*pattern*)).
  */
 public enum PatternGroup implements IEnumPattern {
     SP("\\p{Space}", true),

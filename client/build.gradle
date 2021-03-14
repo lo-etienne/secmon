@@ -16,6 +16,6 @@ compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
-application{
-    mainClass = "be.flmr.secmon.client.Client"
+application {
+    mainClass = "be.flmr.secmon.client.Program"
 }

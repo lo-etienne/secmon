@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Protocol {
     /**
-     * @return le {@link ProtocolPattern} qui détermine si la méthode devra être exécutée ou non par {@link AbstractRouter::execute}
+     * @return le {@link ProtocolPattern} qui détermine si la méthode devra être exécutée ou non par {@code AbstractRouter::execute}
      */
     ProtocolPattern pattern();
 }

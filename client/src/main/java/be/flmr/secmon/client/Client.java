@@ -8,6 +8,7 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
+import java.net.Socket;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -21,18 +22,33 @@ public class Client implements IProtocolPacketSender{
     private PrintWriter writer;
     private BufferedReader buffered;
     private ProtocolClient pc;
-    private SSLSocket socket;
+    private Socket socket;
 
     /**
      * Constructeur de Client
      * @param stream permetant de creer la class qui affichera les reponse du serveur
      * @param host hote pour creer un socket
      * @param port port pour creer un socket
+     * @param tls si le client se lance en TLS ou non
      */
-    public Client(PrintStream stream, String host, String port){
+    public Client(PrintStream stream, String host, String port, boolean tls){
         this.stream = stream;
         this.pc = new ProtocolClient(stream);
-        createSSLSocket(host, port);
+        if (tls) {
+            createSSLSocket(host, port);
+        } else {
+            createSocket(host, port);
+        }
+    }
+
+    private void createSocket(String host, String port) {
+        try {
+            socket = new Socket(host, Integer.parseInt(port));
+            writer = new PrintWriter(socket.getOutputStream());
+            buffered = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -62,14 +78,14 @@ public class Client implements IProtocolPacketSender{
             context.init(null,trust.getTrustManagers(),new SecureRandom());
 
             SSLSocketFactory factory = context.getSocketFactory();
-            socket = (SSLSocket) factory.createSocket(host, Integer.parseInt(port));
+            socket = factory.createSocket(host, Integer.parseInt(port));
             writer = new PrintWriter(socket.getOutputStream());
             buffered = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         } catch (IOException | KeyStoreException e) {
-            throw new RuntimeException("Connection SSl non reussit",e);
+            throw new RuntimeException("Connexion au serveur non réussie",e);
         } catch (CertificateException | NoSuchAlgorithmException e) {
-            throw new RuntimeException("Erreur non traiter",e);
+            throw new RuntimeException("Erreur non traitée",e);
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
@@ -130,7 +146,7 @@ public class Client implements IProtocolPacketSender{
 
     /**
      * Affiche le ProtocolPacket du paramettre au writer de la class et flush
-     * @param packet
+     * @param packet le packet à envoyer
      */
     @Override
     public void send(IProtocolPacket packet) {

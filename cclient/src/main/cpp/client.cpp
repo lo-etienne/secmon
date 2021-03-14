@@ -1,7 +1,11 @@
 #include "client.hpp"
 #include <netdb.h>
 
-
+/**
+ * Fonction qui créé un contexte SSL
+ *
+ * @return le contexte SSL
+ */
 SSL_CTX *init_ctx() 
 {
     const SSL_METHOD *method = TLS_client_method();
@@ -14,6 +18,12 @@ SSL_CTX *init_ctx()
     return ctx;
 }
 
+/**
+ * Fonction qui créé un socket client et qui le met dans une structure définie dans {@link client.hpp}
+ *
+ * @param hostname le nom de l'hote
+ * @param port le port auquel le client se connecte
+ */
 struct client_socket *client_connect(char *hostname, char *port) 
 {
     struct hostent *host = gethostbyname(hostname);
@@ -93,14 +103,29 @@ struct client_socket *client_connect(char *hostname, char *port)
     return cs;
 }
 
+/**
+ * Fonction qui envoie un message encrypté par SSL
+ *
+ * @param message le message à envoyer
+ * @param cs la structure contenant le socket du client
+ */
 void client_send(char* message, client_socket* cs) {
     SSL_write(cs->ssl, message, strlen(message));
 }
 
+/**
+ * Fonction qui reçoit un message encrypté par SSL
+ *
+ * @param buf le buffer de réception
+ * @param cs la structure contenant le socket du client
+ */
 void client_receive(char* buff, int buff_len, client_socket* cs) {
     SSL_read(cs->ssl, buff, buff_len);
 }
 
+/**
+ * Fonction qui libère les ressources de la struct client_socket
+ */
 void client_free(client_socket* cs) {
     SSL_free(cs->ssl);
     close(cs->fd);

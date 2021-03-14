@@ -56,13 +56,6 @@ public class RouterTest {
     }
 
     @Test
-    final void throwsExceptionWhenNonNullableParameterIsNotSpecified() {
-        when(packet.getType()).thenReturn(ANNOUNCE);
-
-        assertThrows(NullPointerException.class, () -> router.execute(this, packet));
-    }
-
-    @Test
     final void throwsExceptionWhenMethodDoesNotContainGroupAnnotation() {
         when(packet.getType()).thenReturn(NOTIFICATION);
 

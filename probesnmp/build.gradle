@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'be.flmr.secmon'
@@ -9,4 +10,12 @@ dependencies {
     implementation project(':probe')
     implementation project(':core')
     implementation group: 'org.snmp4j', name: 'snmp4j', version: '3.4.4'
+}
+
+application {
+    mainClass = "be.flmr.secmon.probesnmp.Program"
+}
+
+run {
+    standardInput = System.in
 }

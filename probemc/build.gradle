@@ -10,3 +10,11 @@ dependencies {
 
 group 'be.flmr.secmon'
 version '0.1'
+
+application {
+    mainClass = "be.flmr.secmon.probemc.Program"
+}
+
+run {
+    standardInput = System.in
+}

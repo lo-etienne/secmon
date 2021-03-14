@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * Le probe communicator est la partie du Daemon qui communique avec les différentes probes. Lorsqu'une probe envoie
- * un message en multicast, le communicator s'occupe de répondre a ce message (ANNOUNCE -> CURCONFIG ou NOTIFY -> STATEREQ).
+ * un message en multicast, le communicator s'occupe de répondre a ce message (ANNOUNCE -&gt; CURCONFIG ou NOTIFY -$gt; STATEREQ).
  * Dans le premier cas, le communicator ira chercher dans la configuration du daemon les différents services à passer
  * au probe. Dans le second, il enverra une requête de statut et attendra une réponse de la probe. Lorsque cette dernière
  * a envoyé sa réponse, le communicator stock alors l'état d'un des services dans un stack
@@ -71,7 +71,7 @@ public class ProbeCommunicator extends AbstractRouter implements INorthPole {
     }
 
     /**
-     * Méthode exéctuée par {@link AbstractRouter::execute} lorsqu'un packet de type {@link ProtocolPacket.ANNOUNCE}
+     * Méthode exéctuée par {@link AbstractRouter::execute} lorsqu'un packet de type {@code ProtocolPacket.ANNOUNCE}
      * est passé en paramètre de cette dernière. Celle-ci en particulier traite les message d'annonce des probes. Elle
      * envoie donc la configuration des services à ces dites probes.
      * @param sender l'envoyeur, ici, une instance de {@code InetAddress}
@@ -105,7 +105,7 @@ public class ProbeCommunicator extends AbstractRouter implements INorthPole {
     }
 
     /**
-     * Méthode exéctuée par {@link AbstractRouter::execute} lorsqu'un packet de type {@link ProtocolPacket.NOTIFICATION}
+     * Méthode exéctuée par {@link AbstractRouter::execute} lorsqu'un packet de type {@code ProtocolPacket.NOTIFICATION}
      * est passé en paramètre de cette dernière. Celle-ci en particulier traite les message de notification des probes.
      * Elle renvoie alors des requêtes d'état vers les probes et attends une réponse d'état de la part des probes.
      * @param sender l'envoyeur, ici, une instance de {@code InetAddress}
@@ -138,7 +138,7 @@ public class ProbeCommunicator extends AbstractRouter implements INorthPole {
     }
 
     /**
-     * Méthode exéctuée par {@link AbstractRouter::execute} lorsqu'un packet de type {@link ProtocolPacket.STATE_RESP}
+     * Méthode exéctuée par {@link AbstractRouter::execute} lorsqu'un packet de type {@code ProtocolPacket.STATE_RESP}
      * est passé en paramètre de cette dernière. Celle-ci en particulier traite les message de réponse de requête des probes.
      * Lorsqu'un STATE_RESP est renvoyé, alors le {@code ProbeCommunicator} push les états reçu dans le stack du service
      * en question.

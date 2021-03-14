@@ -115,7 +115,7 @@ public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseab
         Optional<IService> optionalService = config.getServices()
                 .stream()
                 .filter(s -> s.getID().equals(id)).findFirst();
-        if(optionalService.isPresent()) {
+        if (optionalService.isPresent()) {
             IService service = optionalService.get();
             if (stateStack.hasService(service)) {
                 ServiceState serviceState = stateStack.getLastState(service);
@@ -157,7 +157,7 @@ public class SouthPole extends AbstractRouter implements ISouthPole, AutoCloseab
                 Socket socket = serverSocket.accept();
                 log.info("Client connecté");
                 // Handshake nécessaire si TLS (NB : Handshake TCP géré par Java)
-                if(config.isTls()) {
+                if (config.isTls()) {
                     ((SSLSocket) socket).startHandshake();
                 }
                 DaemonClient client = new DaemonClient(socket, this);

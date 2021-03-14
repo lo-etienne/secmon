@@ -23,6 +23,7 @@ public class ProtocolPacket implements IProtocolPacket {
     /**
      * Crée une instance de {@link ProtocolPacket} à partir d'un message.
      * @param message le message (i.e. {@code IAMHERE snmp 161})
+     * @param address l'addresse d'où provient le ProtocolPacket
      * @return l'instance de protocol pattern avec les valeurs spécifiées.
      */
     public static ProtocolPacket from(String message, InetAddress address) {
@@ -44,8 +45,8 @@ public class ProtocolPacket implements IProtocolPacket {
     }
 
     /**
-     * Renvoie la valeur d'un groupe. (i.e. {@code getValue({@link PatternGroup.PORT}) -> 161}
-     * @param group le type de valeur (i.e. {@link PatternGroup.PORT}
+     * Renvoie la valeur d'un groupe. (i.e. {@code getValue({@code PatternGroup.PORT}) -> 161}
+     * @param group le type de valeur (i.e. {@code PatternGroup.PORT}
      * @return sa valeur (i.e. 161)
      */
     @Override

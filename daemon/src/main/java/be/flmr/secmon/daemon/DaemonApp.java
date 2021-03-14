@@ -32,27 +32,34 @@ public class DaemonApp {
         }
 
         ServiceStateStack serviceStateStack = new ServiceStateStack();
-        SouthPole southPole = new SouthPole(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
-        ProbeCommunicator probeCommunicator = new ProbeCommunicator(daemonJSONConfig, serviceStateStack);
 
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            SouthPole southPole = new SouthPole(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
 
-        executor.execute(probeCommunicator);
-        executor.execute(southPole);
+            ProbeCommunicator probeCommunicator = new ProbeCommunicator(daemonJSONConfig, serviceStateStack);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            LOG.info("Début de la fermeture du serveur ...");
-            southPole.close();
-        }));
-        Scanner scanner = new Scanner(System.in);
-        String line;
-        // Boucle while + Scanner.nextLine().equals() ... comme condition does not loop
-        while (true) {
-            line = scanner.nextLine();
-            if (line.equals("quit")) {
-                executor.shutdown();
-                System.exit(0);
+            ExecutorService executor = Executors.newFixedThreadPool(2);
+
+            executor.execute(probeCommunicator);
+            executor.execute(southPole);
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                LOG.info("Début de la fermeture du serveur ...");
+                southPole.close();
+            }));
+            Scanner scanner = new Scanner(System.in);
+            String line;
+            // Boucle while + Scanner.nextLine().equals() ... comme condition does not loop
+            while (true) {
+                line = scanner.nextLine();
+                if (line.equals("quit")) {
+                    executor.shutdown();
+                    System.exit(0);
+                }
             }
+        } catch (Exception e) {
+            LOG.error("Une erreur s'est produite {}", e.getMessage() == null ? "" : ": " + e.getMessage());
+            System.exit(-1);
         }
     }
 

@@ -39,7 +39,7 @@ public class Program implements Callable<Integer> {
     @Override
     public Integer call() {
         try {
-            Client client = new Client(System.out, host, port, tls);
+            Client client = new Client(System.out, host, port, !tls);
             if (verify()) {
                 switch (typeService) {
                     case "add-service":

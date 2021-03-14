@@ -2,10 +2,10 @@ package be.flmr.secmon.daemon;
 
 import be.flmr.secmon.daemon.config.DaemonJSONConfig;
 import be.flmr.secmon.daemon.config.DaemonJSONConfigurationReader;
+import be.flmr.secmon.daemon.net.ClientCommunicator;
 import be.flmr.secmon.daemon.net.ProbeCommunicator;
 import be.flmr.secmon.daemon.net.ServiceStateStack;
 import be.flmr.secmon.daemon.net.SocketFactory;
-import be.flmr.secmon.daemon.net.SouthPole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +37,13 @@ public class DaemonApp {
         ServiceStateStack serviceStateStack = new ServiceStateStack();
 
         try {
-        ClientCommunicator clientCommunicator = new ClientCommunicator(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
-        ProbeCommunicator probeCommunicator = new ProbeCommunicator(daemonJSONConfig, serviceStateStack);
+            ClientCommunicator clientCommunicator = new ClientCommunicator(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
+            ProbeCommunicator probeCommunicator = new ProbeCommunicator(daemonJSONConfig, serviceStateStack);
 
             ExecutorService executor = Executors.newFixedThreadPool(2);
 
-        executor.execute(probeCommunicator);
-        executor.execute(clientCommunicator);
+            executor.execute(probeCommunicator);
+            executor.execute(clientCommunicator);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 LOG.info("Début de la fermeture du serveur ...");

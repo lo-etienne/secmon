@@ -11,10 +11,10 @@ import java.io.IOException;
 
 public class ServiceJSONParser extends TypeAdapter<IService> {
 
+
     @Override
     public void write(JsonWriter out, IService value) throws IOException {
         out.value(value.getAugmentedURL());
-
     }
 
     @Override

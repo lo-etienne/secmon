@@ -16,6 +16,9 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Il s'agit de la classe qui permettra d'exécuter le Daemon
+ */
 public class DaemonApp {
 
     private static final Logger LOG = LoggerFactory.getLogger(DaemonApp.class);
@@ -34,18 +37,17 @@ public class DaemonApp {
         ServiceStateStack serviceStateStack = new ServiceStateStack();
 
         try {
-            SouthPole southPole = new SouthPole(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
-
-            ProbeCommunicator probeCommunicator = new ProbeCommunicator(daemonJSONConfig, serviceStateStack);
+        ClientCommunicator clientCommunicator = new ClientCommunicator(daemonJSONConfig, serviceStateStack, SocketFactory::createSocketByConfig);
+        ProbeCommunicator probeCommunicator = new ProbeCommunicator(daemonJSONConfig, serviceStateStack);
 
             ExecutorService executor = Executors.newFixedThreadPool(2);
 
-            executor.execute(probeCommunicator);
-            executor.execute(southPole);
+        executor.execute(probeCommunicator);
+        executor.execute(clientCommunicator);
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 LOG.info("Début de la fermeture du serveur ...");
-                southPole.close();
+                clientCommunicator.close();
             }));
             Scanner scanner = new Scanner(System.in);
             String line;

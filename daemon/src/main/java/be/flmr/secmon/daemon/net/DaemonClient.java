@@ -29,7 +29,11 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
     private boolean disconnected;
 
 
-
+    /**
+     * Crée une instance de {@code DaemonClient} avec un socket et un AbstractRouter
+     * @param socket le socket qui permettra la communication
+     * @param abstractRouter permet l'utiliser des annotations Protocol
+     */
     public DaemonClient(final Socket socket, final AbstractRouter abstractRouter)  {
         try {
             this.socket = socket;
@@ -42,12 +46,23 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
         }
     }
 
+    /**
+     * Méthode qui permet d'envoyer le message que contient un {@code IProcotolPacket} en
+     * utilisant {@link PrintWriter::print}
+     * @param packet objet IProtocolPacket
+     */
     @Override
     public void send(IProtocolPacket packet) {
         printWriter.print(packet.buildMessage());
         printWriter.flush();
     }
 
+    /**
+     * Méthode qui reçoit un {@code String} depuis un BufferedReader. Si ce dernier est null, alors
+     * cela veut dire que le client est déconnecté. S'il ne l'est pas on construit, à l'aide du {@code String}
+     * et du {@code Socket}, un {@code ProtocolPacket} que l'on renvoie
+     * @return le packet reçu
+     */
     @Override
     public IProtocolPacket receive() {
         try {
@@ -68,6 +83,9 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
         return null;
     }
 
+    /**
+     * Méthode qui permet, tant que le client n'est pas déconnecté, d'exécuter {@link AbstractRouter::execute}
+     */
     @Override
     public void run() {
         while(!disconnected) {
@@ -78,6 +96,9 @@ public class DaemonClient implements AutoCloseable, IClient, IProtocolPacketSend
         }
     }
 
+    /**
+     * Méthode qui permet de fermer le {@code Socket}
+     */
     @Override
     public void close() {
         try {

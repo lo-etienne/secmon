@@ -4,6 +4,12 @@ Secmon (abbréviation pour Secure Monitor) est une solution
 comprenant trois programmes afin de tracker les états d'un service sur
 Internet.
 
+## IntelliJ
+
+Si vous importez le projet via IntelliJ, la plupart des commandes à
+exécuter sont abrégées par l'IDE, notemment avec les "run configurations"
+ou bien le plugin gradle intégré à l'IDE
+
 ## Le build
 
 Pour build le projet, il suffit d'exécuter

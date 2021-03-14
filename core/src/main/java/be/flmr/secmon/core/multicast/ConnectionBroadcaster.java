@@ -120,6 +120,9 @@ public class ConnectionBroadcaster implements IProtocolPacketReceiver, IProtocol
         return executor.scheduleWithFixedDelay(() -> sendMessage(packet.buildMessage()), 0, timeOut, unit);
     }
 
+    /**
+     * Méthode qui permet de mettre fin à l'exécution du ScheduledExecutorService
+     */
     @Override
     public void close() {
         executor.shutdown();

@@ -14,13 +14,28 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Classe implémentant la première extension du projet secmon
+ */
 public class MinecraftServiceProber implements ServiceProber {
     private final Gson gson;
 
+    /**
+     * Méthode qui permet de créer une instance de MinecraftServiceProber
+     */
     public MinecraftServiceProber() {
         this.gson = new Gson();
     }
 
+    /**
+     * Méthode qui permet, à partir d'un serveur Minecraft, de récupérer le nombre de joueurs. Pour ce faire
+     * on envoie un packet de byte à l'hôte pour qu'il nous réponde avec un fichier JSON contenant le nombre de
+     * joueurs actuellement connectés sur le serveur. Les packet de byte sont spécifiés dans
+     * <a href="https://wiki.vg/Protocol">ce wiki</a>
+     * @param service objet Service à sonder
+     * @return le nombre de joueurs actuellement connectés
+     * @throws IOException
+     */
     @Override
     public int get(IService service) throws IOException {
         String host = PatternUtils.extractGroup(service.getURL(), PatternGroup.URL, PatternGroup.HOST.name());
@@ -62,15 +77,33 @@ public class MinecraftServiceProber implements ServiceProber {
         }
     }
 
+    /**
+     * Méthode qui permet d'écrire un byte
+     * @param buf DataOuputStream dans lequel sera écrire {@param b}
+     * @param b byte à écrire
+     * @throws IOException
+     */
     public static void writeByte(DataOutputStream buf, byte b) throws IOException {
         buf.writeByte(b);
     }
 
+    /**
+     * Méthode qui permet de convertir un String en VarString
+     * @param buf DataOutputStream qui servira à écrire le VarString
+     * @param str valeur à convertir en VarString
+     * @throws IOException
+     */
     public static void writeString(DataOutputStream buf, String str) throws IOException {
         writeVarInt(buf, str.getBytes(StandardCharsets.UTF_8).length);
         for (byte b : str.getBytes(StandardCharsets.UTF_8)) writeByte(buf, b);
     }
 
+    /**
+     * Méthode qui permet de convertir un entier en VarInt
+     * @param buf DataOutputStream qui servira à écrire le VarInt
+     * @param value valeur à convertir en VarInt
+     * @throws IOException
+     */
     public static void writeVarInt(DataOutputStream buf, int value) throws IOException {
         do {
             byte temp = (byte) (value & 0b01111111);
@@ -83,10 +116,22 @@ public class MinecraftServiceProber implements ServiceProber {
         } while (value != 0);
     }
 
+    /**
+     * Méthode qui permet de lire un byte à partir d'un DataInputStream
+     * @param buf DataInputStream qui contient le byte à lire
+     * @return un byte
+     * @throws IOException
+     */
     public static byte readByte(DataInputStream buf) throws IOException {
         return buf.readByte();
     }
 
+    /**
+     * Méthode qui permet de convertir un VarInt en un entier
+     * @param buf DataInputStream qui servira à lire le VarInt
+     * @return un entier
+     * @throws IOException
+     */
     public static int readVarInt(DataInputStream buf) throws IOException {
         int numRead = 0;
         int result = 0;
@@ -103,9 +148,5 @@ public class MinecraftServiceProber implements ServiceProber {
         } while ((read & 0b10000000) != 0);
 
         return result;
-    }
-
-    public String a(byte[] arr) {
-        return new String(arr, StandardCharsets.UTF_8);
     }
 }
